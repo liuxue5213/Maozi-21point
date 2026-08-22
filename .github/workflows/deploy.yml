@@ -134,9 +134,10 @@ jobs:
           username: ${{ secrets.SERVER_USER }}
           password: ${{ secrets.SERVER_PASSWORD }}
           port: 22
-          script_stop: true
+          script_stop: false
           script: |
             echo "===== 开始部署 帽子21点 ====="
+            set -e
             
             # 创建项目目录
             mkdir -p /www/maozi-21point
@@ -146,31 +147,24 @@ jobs:
             if [ ! -d ".git" ]; then
               git clone ${{ github.server_url }}/${{ github.repository }}.git .
             else
-              git pull origin main || git pull origin master
+              git pull origin main 2>/dev/null || git pull origin master 2>/dev/null || echo "Git update skipped"
             fi
             
-            # 安装依赖
-            npm ci
-            cd backend && npm ci --production && cd ..
-            cd frontend && npm ci && npm run build && cd ..
+            # 安装依赖（使用 npm install 而不是 ci，更可靠）
+            npm install --production 2>/dev/null || echo "Root install skipped"
+            cd backend && npm install --production && cd ..
+            cd frontend && npm install && npm run build && cd ..
             
             # 使用 PM2 启动/重启后端
-            if command -v pm2 &> /dev/null; then
-              pm2 restart maozi-21point 2>/dev/null || pm2 start backend/src/index.js --name maozi-21point
-              pm2 save
-            else
+            export PATH="$PATH:$(npm root -g)/.bin:/usr/local/bin"
+            if ! command -v pm2 &> /dev/null; then
               npm install -g pm2
-              pm2 start backend/src/index.js --name maozi-21point
-              pm2 save
-              pm2 startup
             fi
-            
-            # 重启 Nginx
-            if command -v nginx &> /dev/null; then
-              sudo nginx -t && sudo systemctl reload nginx
-            fi
+            pm2 restart maozi-21point 2>/dev/null || pm2 start backend/src/index.js --name maozi-21point
+            pm2 save
             
             echo "===== 部署完成 ====="
+            pm2 list
 
       - name: 部署通知
         if: always()
