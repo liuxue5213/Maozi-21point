@@ -60,11 +60,11 @@ jobs:
         with:
           node-version: '22'
 
-      - name: 设置 JDK 17
+      - name: 设置 JDK 21
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
-          java-version: '17'
+          java-version: '21'
 
       - name: 安装前端依赖
         run: |

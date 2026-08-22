@@ -3,6 +3,11 @@ apply plugin: 'com.android.application'
 android {
     namespace = "com.maozi.blackjack"
     compileSdk = rootProject.ext.compileSdkVersion
+    
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_21
+        targetCompatibility JavaVersion.VERSION_21
+    }
     defaultConfig {
         applicationId "com.maozi.blackjack"
         minSdkVersion rootProject.ext.minSdkVersion
