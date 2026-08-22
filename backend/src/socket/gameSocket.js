@@ -18,6 +18,11 @@ const aiTimers = new Map();
 function initSocket(io) {
   io.on('connection', (socket) => {
     console.log(`玩家连接: ${socket.id}`);
+    
+    // 发送在线人数
+    const onlineCount = io.engine.clientsCount;
+    socket.emit('onlineCount', { count: onlineCount, matching: matchQueue.length });
+    io.emit('onlineCount', { count: onlineCount, matching: matchQueue.length });
 
     // 玩家信息设置
     socket.on('setPlayer', (data) => {

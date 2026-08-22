@@ -27,6 +27,8 @@ const useGameStore = create((set, get) => ({
   // UI状态
   message: '',
   error: '',
+  onlineCount: 0,
+  matchingCount: 0,
   
   // 设置玩家名
   setPlayerName: (name) => {
@@ -62,7 +64,11 @@ const useGameStore = create((set, get) => ({
     });
     
     socket.on('waitingMatch', () => {
-      set({ currentScreen: 'waiting', message: '正在寻找对手...' });
+      set({ currentScreen: 'waiting', message: '正在匹配玩家中...' });
+    });
+    
+    socket.on('onlineCount', (data) => {
+      set({ onlineCount: data.count || 0, matchingCount: data.matching || 0 });
     });
     
     socket.on('matchCancelled', () => {

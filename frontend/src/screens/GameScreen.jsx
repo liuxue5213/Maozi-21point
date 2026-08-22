@@ -1,8 +1,8 @@
 /**
- * 帽子21点 - 游戏主界面 (自然风格)
+ * 帽子21点 - 游戏主界面 (自然浅色风格)
  */
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from '../rnw';
 import useGameStore from '../store/gameStore';
 import Hand from '../components/Hand';
@@ -11,6 +11,47 @@ import GameActions from '../components/GameActions';
 
 const GameScreen = () => {
   const { gameState, playerId, gameMode, backToLobby } = useGameStore();
+  const [score, setScore] = useState({ win: 0, lose: 0, draw: 0 });
+  const [lastResult, setLastResult] = useState(null);
+
+  // 计算手牌点数
+  const calcHand = (cards) => {
+    if (!cards) return 0;
+    let total = 0, aces = 0;
+    for (const card of cards) {
+      if (card.hidden) continue;
+      total += card.value;
+      if (card.rank === 'A') aces++;
+    }
+    while (total > 21 && aces > 0) { total -= 10; aces--; }
+    return total;
+  };
+
+  // 监听结果变化，更新比分
+  useEffect(() => {
+    if (!gameState || gameState.state !== 'finished') return;
+    
+    const me = gameState.players.find(p => p.id === playerId);
+    if (!me || !me.result || me.result === lastResult) return;
+    
+    setLastResult(me.result);
+    
+    if (me.result === 'win' || me.result === 'blackjack') {
+      setScore(prev => ({ ...prev, win: prev.win + 1 }));
+    } else if (me.result === 'lose') {
+      setScore(prev => ({ ...prev, lose: prev.lose + 1 }));
+    } else if (me.result === 'push') {
+      setScore(prev => ({ ...prev, draw: prev.draw + 1 }));
+    }
+  }, [gameState?.state]);
+
+  // 重置比分（新一轮游戏时）
+  useEffect(() => {
+    if (gameState?.state === 'betting' && gameState.round === 1) {
+      setScore({ win: 0, lose: 0, draw: 0 });
+      setLastResult(null);
+    }
+  }, [gameState?.round]);
 
   if (!gameState) {
     return (
@@ -27,18 +68,6 @@ const GameScreen = () => {
   const isFinished = gameState.state === 'finished';
   const isDealerTurn = gameState.state === 'dealer';
 
-  const calcHand = (cards) => {
-    if (!cards) return 0;
-    let total = 0, aces = 0;
-    for (const card of cards) {
-      if (card.hidden) continue;
-      total += card.value;
-      if (card.rank === 'A') aces++;
-    }
-    while (total > 21 && aces > 0) { total -= 10; aces--; }
-    return total;
-  };
-
   const getResultText = (result) => {
     switch (result) {
       case 'win': return '获胜';
@@ -53,7 +82,7 @@ const GameScreen = () => {
     switch (result) {
       case 'win': return '#5b8c5a';
       case 'lose': return '#c9584a';
-      case 'push': return '#c4945c';
+      case 'push': return '#7a7068';
       case 'blackjack': return '#8b5cf6';
       default: return '#a89f94';
     }
@@ -67,8 +96,8 @@ const GameScreen = () => {
           <Text style={styles.backBtnText}>←</Text>
         </TouchableOpacity>
         <View style={styles.headerCenter}>
-          <Text style={styles.roundText}>第{gameState.round}轮</Text>
-          <Text style={styles.modeText}>{gameMode === 'pve' ? '人机' : '1V1'}</Text>
+          <Text style={styles.scoreText}>{score.win} - {score.lose} - {score.draw}</Text>
+          <Text style={styles.modeText}>{gameMode === 'pve' ? '人机对战' : '1V1对战'}</Text>
         </View>
         <Text style={styles.chips}>💰{me?.chips || 0}</Text>
       </View>
@@ -104,7 +133,7 @@ const GameScreen = () => {
                         {c.rank}{c.suit}
                       </Text>
                     )}
-                    {c.hidden && <Text style={{ fontSize: 12, color: 'rgba(255,255,255,0.6)' }}>♠</Text>}
+                    {c.hidden && <Text style={{ fontSize: 12, color: 'rgba(255,255,255,0.5)' }}>♠</Text>}
                   </View>
                 ))}
               </View>
@@ -143,12 +172,13 @@ const GameScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f3f0',
+    backgroundColor: '#f8f6f3',
   },
   loading: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
+    backgroundColor: '#f8f6f3',
   },
   loadingText: {
     color: '#a89f94',
@@ -160,7 +190,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 16,
     paddingVertical: 12,
-    backgroundColor: 'white',
+    backgroundColor: '#ffffff',
     borderBottomWidth: 1,
     borderBottomColor: '#e8e2d8',
   },
@@ -176,14 +206,15 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 2,
   },
-  roundText: {
-    fontSize: 12,
-    color: '#a89f94',
-    fontWeight: '500',
+  scoreText: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#2c2418',
+    letterSpacing: 1,
   },
   modeText: {
     fontSize: 11,
-    color: '#d0c8bc',
+    color: '#c4bf',
   },
   chips: {
     fontSize: 14,
@@ -206,19 +237,21 @@ const styles = StyleSheet.create({
   },
   statusText: {
     fontSize: 12,
-    color: '#a89f94',
+    color: '#7a7068',
     paddingVertical: 4,
     paddingHorizontal: 12,
-    backgroundColor: 'white',
+    backgroundColor: '#ffffff',
     borderRadius: 12,
     overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: '#e8e2d8',
   },
   opponents: {
     gap: 10,
   },
   oppCard: {
     padding: 12,
-    backgroundColor: 'white',
+    backgroundColor: '#ffffff',
     borderRadius: 10,
     borderWidth: 1,
     borderColor: '#e8e2d8',
@@ -246,7 +279,7 @@ const styles = StyleSheet.create({
     width: 32,
     height: 44,
     borderRadius: 4,
-    backgroundColor: 'white',
+    backgroundColor: '#ffffff',
     borderWidth: 1,
     borderColor: '#e8e2d8',
     alignItems: 'center',
@@ -275,7 +308,7 @@ const styles = StyleSheet.create({
   },
   oppBet: {
     fontSize: 10,
-    color: '#d0c8bc',
+    color: '#c4bf',
   },
   myArea: {
     alignItems: 'center',

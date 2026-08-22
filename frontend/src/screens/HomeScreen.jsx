@@ -1,5 +1,5 @@
 /**
- * 帽子21点 - 首页/登录页 (自然风格)
+ * 帽子21点 - 首页 (超浅色自然风格)
  */
 
 import React, { useState } from 'react';
@@ -19,51 +19,48 @@ const HomeScreen = () => {
   return (
     <View style={styles.container}>
       <View style={styles.content}>
-        {/* Logo区域 */}
+        {/* Logo */}
         <View style={styles.logoArea}>
           <View style={styles.logoBox}>
-            <Text style={styles.logoEmoji}>♠</Text>
+            <Text style={styles.logoIcon}>♠</Text>
           </View>
           <Text style={styles.title}>帽子21点</Text>
           <Text style={styles.subtitle}>Blackjack</Text>
         </View>
 
-        {/* 功能卡片 */}
-        <View style={styles.featureRow}>
+        {/* 功能 */}
+        <View style={styles.features}>
           <View style={styles.featureItem}>
-            <Text style={styles.featureEmoji}>🤖</Text>
+            <Text style={styles.featureIcon}>🤖</Text>
             <Text style={styles.featureLabel}>人机</Text>
           </View>
           <View style={styles.featureItem}>
-            <Text style={styles.featureEmoji}>⚔️</Text>
+            <Text style={styles.featureIcon}>⚔️</Text>
             <Text style={styles.featureLabel}>对战</Text>
           </View>
           <View style={styles.featureItem}>
-            <Text style={styles.featureEmoji}>🎰</Text>
+            <Text style={styles.featureIcon}>🎰</Text>
             <Text style={styles.featureLabel}>下注</Text>
           </View>
         </View>
 
-        {/* 输入区域 */}
+        {/* 输入 */}
         <View style={styles.inputArea}>
           <TextInput
             style={styles.input}
-            placeholder="输入你的昵称"
-            placeholderTextColor="#a89f94"
+            placeholder="输入昵称"
+            placeholderTextColor="#b8b3ad"
             value={name}
             onChangeText={setName}
             maxLength={10}
             onSubmitEditing={handleStart}
           />
           <TouchableOpacity style={styles.startBtn} onPress={handleStart}>
-            <Text style={styles.startBtnText}>开始</Text>
+            <Text style={styles.startBtnText}>开始游戏</Text>
           </TouchableOpacity>
         </View>
 
-        {/* 底部信息 */}
-        <View style={styles.footer}>
-          <Text style={styles.footerText}>起始筹码 1000 · 经典21点规则</Text>
-        </View>
+        <Text style={styles.footer}>起始筹码 1000</Text>
       </View>
     </View>
   );
@@ -73,103 +70,98 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center',
-    backgroundColor: '#f5f3f0',
+    backgroundColor: '#faf9f7',
     paddingHorizontal: 24,
   },
   content: {
     width: '100%',
-    maxWidth: 360,
+    maxWidth: 340,
     alignSelf: 'center',
     alignItems: 'center',
-    gap: 28,
+    gap: 24,
   },
   logoArea: {
     alignItems: 'center',
-    gap: 8,
+    gap: 6,
   },
   logoBox: {
-    width: 72,
-    height: 72,
-    borderRadius: 16,
-    backgroundColor: '#2c2418',
+    width: 64,
+    height: 64,
+    borderRadius: 14,
+    backgroundColor: '#f0ece6',
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 4,
   },
-  logoEmoji: {
-    fontSize: 36,
-    color: '#f5f3f0',
+  logoIcon: {
+    fontSize: 32,
+    color: '#8a8580',
   },
   title: {
-    fontSize: 28,
+    fontSize: 26,
     fontWeight: '700',
-    color: '#2c2418',
+    color: '#4a4540',
     letterSpacing: 2,
   },
   subtitle: {
-    fontSize: 13,
-    color: '#a89f94',
-    letterSpacing: 4,
+    fontSize: 12,
+    color: '#b8b3ad',
+    letterSpacing: 3,
     textTransform: 'uppercase',
   },
-  featureRow: {
+  features: {
     flexDirection: 'row',
-    gap: 16,
+    gap: 12,
   },
   featureItem: {
     alignItems: 'center',
     gap: 4,
-    paddingVertical: 10,
-    paddingHorizontal: 18,
+    paddingVertical: 8,
+    paddingHorizontal: 16,
     backgroundColor: 'white',
-    borderRadius: 10,
+    borderRadius: 8,
     borderWidth: 1,
-    borderColor: '#e8e2d8',
+    borderColor: '#ebe7e2',
   },
-  featureEmoji: {
-    fontSize: 20,
+  featureIcon: {
+    fontSize: 18,
   },
   featureLabel: {
-    fontSize: 12,
-    color: '#7a7068',
-    fontWeight: '500',
+    fontSize: 11,
+    color: '#8a8580',
   },
   inputArea: {
     width: '100%',
-    gap: 12,
+    gap: 10,
   },
   input: {
     width: '100%',
-    paddingVertical: 14,
+    paddingVertical: 13,
     paddingHorizontal: 16,
     backgroundColor: 'white',
     borderWidth: 1.5,
-    borderColor: '#e8e2d8',
-    borderRadius: 10,
+    borderColor: '#ebe7e2',
+    borderRadius: 8,
     fontSize: 16,
-    color: '#2c2418',
+    color: '#4a4540',
     outlineStyle: 'none',
   },
   startBtn: {
     width: '100%',
-    paddingVertical: 15,
-    backgroundColor: '#5b8c5a',
-    borderRadius: 10,
+    paddingVertical: 14,
+    backgroundColor: '#6b9b6a',
+    borderRadius: 8,
     alignItems: 'center',
   },
   startBtnText: {
     color: 'white',
     fontSize: 16,
     fontWeight: '600',
-    letterSpacing: 2,
+    letterSpacing: 1,
   },
   footer: {
-    marginTop: 8,
-  },
-  footerText: {
     fontSize: 12,
-    color: '#a89f94',
-    letterSpacing: 0.5,
+    color: '#b8b3ad',
   },
 });
 

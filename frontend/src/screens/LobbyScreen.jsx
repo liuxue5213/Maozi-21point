@@ -1,5 +1,5 @@
 /**
- * 帽子21点 - 游戏大厅 (自然风格)
+ * 帽子21点 - 游戏大厅 (超浅色)
  */
 
 import React from 'react';
@@ -7,11 +7,11 @@ import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from '../rnw';
 import useGameStore from '../store/gameStore';
 
 const LobbyScreen = () => {
-  const { playerName, startPvE, startMatch, connected } = useGameStore();
+  const { playerName, startPvE, startMatch, connected, onlineCount } = useGameStore();
 
   return (
     <View style={styles.container}>
-      {/* 顶部栏 */}
+      {/* 顶部 */}
       <View style={styles.header}>
         <View style={styles.playerInfo}>
           <View style={styles.avatar}>
@@ -22,14 +22,16 @@ const LobbyScreen = () => {
             <Text style={styles.playerChips}>💰 1000</Text>
           </View>
         </View>
-        <View style={[styles.statusDot, { backgroundColor: connected ? '#5b8c5a' : '#c9584a' }]} />
+        <View style={styles.statusArea}>
+          <View style={[styles.statusDot, { backgroundColor: connected ? '#6b9b6a' : '#c9605a' }]} />
+          <Text style={styles.statusText}>{onlineCount}人在线</Text>
+        </View>
       </View>
 
-      {/* 主内容 */}
+      {/* 内容 */}
       <ScrollView style={styles.content} contentContainerStyle={styles.contentInner}>
         <Text style={styles.label}>选择模式</Text>
         
-        {/* 人机对战 */}
         <TouchableOpacity style={styles.card} onPress={startPvE}>
           <View style={styles.cardIcon}>
             <Text style={styles.cardIconText}>🤖</Text>
@@ -41,7 +43,6 @@ const LobbyScreen = () => {
           <Text style={styles.cardArrow}>→</Text>
         </TouchableOpacity>
 
-        {/* 1V1匹配 */}
         <TouchableOpacity style={styles.card} onPress={startMatch}>
           <View style={styles.cardIcon}>
             <Text style={styles.cardIconText}>⚔️</Text>
@@ -53,7 +54,6 @@ const LobbyScreen = () => {
           <Text style={styles.cardArrow}>→</Text>
         </TouchableOpacity>
 
-        {/* 规则 */}
         <View style={styles.rules}>
           <Text style={styles.rulesTitle}>游戏规则</Text>
           <Text style={styles.ruleItem}>• 目标：接近21点，不超过</Text>
@@ -69,17 +69,17 @@ const LobbyScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f3f0',
+    backgroundColor: '#faf9f7',
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: 20,
-    paddingVertical: 16,
+    paddingVertical: 14,
     backgroundColor: 'white',
     borderBottomWidth: 1,
-    borderBottomColor: '#e8e2d8',
+    borderBottomColor: '#ebe7e2',
   },
   playerInfo: {
     flexDirection: 'row',
@@ -87,43 +87,51 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   avatar: {
-    width: 40,
-    height: 40,
+    width: 38,
+    height: 38,
     borderRadius: 10,
-    backgroundColor: '#2c2418',
+    backgroundColor: '#f0ece6',
     alignItems: 'center',
     justifyContent: 'center',
   },
   avatarText: {
     fontSize: 18,
-    color: '#f5f3f0',
+    color: '#8a8580',
   },
   playerName: {
     fontSize: 15,
     fontWeight: '600',
-    color: '#2c2418',
+    color: '#4a4540',
   },
   playerChips: {
     fontSize: 12,
-    color: '#c4945c',
-    marginTop: 2,
+    color: '#c4a06a',
+    marginTop: 1,
+  },
+  statusArea: {
+    alignItems: 'flex-end',
+    gap: 3,
   },
   statusDot: {
-    width: 10,
-    height: 10,
-    borderRadius: 5,
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+  },
+  statusText: {
+    fontSize: 11,
+    color: '#b8b3ad',
   },
   content: {
     flex: 1,
   },
   contentInner: {
     padding: 20,
-    gap: 14,
+    gap: 12,
   },
   label: {
-    fontSize: 13,
+    fontSize: 12,
     fontWeight: '500',
-    color: '#a89f94',
+    color: '#b8b3ad',
     textTransform: 'uppercase',
     letterSpacing: 1,
   },
@@ -131,58 +139,58 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 14,
-    padding: 18,
+    padding: 16,
     backgroundColor: 'white',
-    borderRadius: 12,
+    borderRadius: 10,
     borderWidth: 1,
-    borderColor: '#e8e2d8',
+    borderColor: '#ebe7e2',
   },
   cardIcon: {
-    width: 44,
-    height: 44,
+    width: 42,
+    height: 42,
     borderRadius: 10,
     backgroundColor: '#f5f3f0',
     alignItems: 'center',
     justifyContent: 'center',
   },
   cardIconText: {
-    fontSize: 22,
+    fontSize: 20,
   },
   cardBody: {
     flex: 1,
-    gap: 3,
+    gap: 2,
   },
   cardTitle: {
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: '600',
-    color: '#2c2418',
+    color: '#4a4540',
   },
   cardDesc: {
-    fontSize: 13,
-    color: '#a89f94',
+    fontSize: 12,
+    color: '#b8b3ad',
   },
   cardArrow: {
-    fontSize: 18,
-    color: '#d0c8bc',
+    fontSize: 16,
+    color: '#d5d0ca',
   },
   rules: {
-    marginTop: 12,
-    padding: 16,
-    backgroundColor: '#faf9f7',
-    borderRadius: 12,
+    marginTop: 10,
+    padding: 14,
+    backgroundColor: '#ffffff',
+    borderRadius: 10,
     borderWidth: 1,
-    borderColor: '#f0ebe4',
+    borderColor: '#f3f0eb',
   },
   rulesTitle: {
-    fontSize: 13,
+    fontSize: 12,
     fontWeight: '600',
-    color: '#7a7068',
-    marginBottom: 10,
+    color: '#8a8580',
+    marginBottom: 8,
   },
   ruleItem: {
-    fontSize: 13,
-    color: '#a89f94',
-    lineHeight: 1.9,
+    fontSize: 12,
+    color: '#b8b3ad',
+    lineHeight: 1.8,
   },
 });
 
