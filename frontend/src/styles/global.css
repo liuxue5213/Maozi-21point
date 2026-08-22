@@ -1,30 +1,48 @@
-/* 帽子21点 - 全局样式 - 浅色主题 */
+/* 帽子21点 - 全局样式 - 自然浅色主题 */
 
 :root {
-  --bg-primary: #f8f9fa;
+  /* 主色调 - 温暖的自然色 */
+  --bg-primary: #f5f3f0;
   --bg-secondary: #ffffff;
-  --bg-card: #ffffff;
-  --text-primary: #1a1a2e;
-  --text-secondary: #6c757d;
-  --accent-green: #2ecc71;
-  --accent-red: #e74c3c;
-  --accent-gold: #f39c12;
-  --accent-blue: #3498db;
-  --border-color: #e9ecef;
-  --shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
-  --shadow-lg: 0 4px 24px rgba(0, 0, 0, 0.12);
-  --radius: 12px;
+  --bg-card: #faf9f7;
+  --bg-warm: #f0ebe4;
+  
+  /* 文字颜色 - 深棕而非纯黑 */
+  --text-primary: #2c2418;
+  --text-secondary: #7a7068;
+  --text-muted: #a89f94;
+  
+  /* 强调色 - 柔和的自然色 */
+  --accent-primary: #5b8c5a;
+  --accent-primary-dark: #4a7a49;
+  --accent-warm: #c4945c;
+  --accent-danger: #c9584a;
+  --accent-info: #5a7d9a;
+  
+  /* 边框和分割线 */
+  --border-color: #e8e2d8;
+  --border-light: #f0ebe4;
+  
+  /* 阴影 - 柔和自然 */
+  --shadow-sm: 0 1px 3px rgba(44, 36, 24, 0.06);
+  --shadow-md: 0 4px 12px rgba(44, 36, 24, 0.08);
+  --shadow-lg: 0 8px 24px rgba(44, 36, 24, 0.1);
+  
+  /* 圆角 */
   --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
 }
 
 body {
   background: var(--bg-primary);
   color: var(--text-primary);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino SansGB', 'Microsoft YaHei', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* 按钮样式 */
+/* 按钮 - 扁平自然风格 */
 .btn {
   display: inline-flex;
   align-items: center;
@@ -32,25 +50,26 @@ body {
   padding: 12px 24px;
   border: none;
   border-radius: var(--radius-sm);
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.15s ease;
   outline: none;
 }
 
 .btn:active {
-  transform: scale(0.96);
+  transform: scale(0.97);
+  opacity: 0.9;
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, var(--accent-green), #27ae60);
+  background: var(--accent-primary);
   color: white;
-  box-shadow: 0 4px 12px rgba(46, 204, 113, 0.3);
+  box-shadow: var(--shadow-sm);
 }
 
 .btn-primary:hover {
-  box-shadow: 0 6px 16px rgba(46, 204, 113, 0.4);
+  background: var(--accent-primary-dark);
 }
 
 .btn-secondary {
@@ -59,121 +78,124 @@ body {
   border: 1px solid var(--border-color);
 }
 
+.btn-warm {
+  background: var(--accent-warm);
+  color: white;
+}
+
 .btn-danger {
-  background: linear-gradient(135deg, var(--accent-red), #c0392b);
+  background: var(--accent-danger);
   color: white;
 }
 
-.btn-gold {
-  background: linear-gradient(135deg, var(--accent-gold), #e67e22);
-  color: white;
-  box-shadow: 0 4px 12px rgba(243, 156, 18, 0.3);
-}
-
-.btn-blue {
-  background: linear-gradient(135deg, var(--accent-blue), #2980b9);
+.btn-info {
+  background: var(--accent-info);
   color: white;
 }
 
-/* 卡牌样式 */
+/* 卡牌 - 经典扑克风格 */
 .card {
-  width: 60px;
-  height: 84px;
-  border-radius: 8px;
+  width: 58px;
+  height: 82px;
+  border-radius: 6px;
   background: white;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  box-shadow: var(--shadow-md);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   font-weight: bold;
   position: relative;
-  transition: transform 0.3s ease;
-}
-
-.card:hover {
-  transform: translateY(-4px);
+  border: 1px solid var(--border-color);
 }
 
 .card.red {
-  color: var(--accent-red);
+  color: #b83030;
 }
 
 .card.black {
-  color: #1a1a2e;
+  color: #2c2418;
 }
 
 .card .rank {
-  font-size: 20px;
+  font-size: 18px;
   line-height: 1;
 }
 
 .card .suit {
-  font-size: 24px;
+  font-size: 22px;
   line-height: 1;
   margin-top: 2px;
 }
 
 .card .card-corner {
   position: absolute;
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 600;
+  line-height: 1.2;
 }
 
 .card .card-corner.top-left {
-  top: 4px;
-  left: 6px;
+  top: 3px;
+  left: 5px;
 }
 
 .card .card-corner.bottom-right {
-  bottom: 4px;
-  right: 6px;
+  bottom: 3px;
+  right: 5px;
   transform: rotate(180deg);
 }
 
 .card.hidden {
-  background: linear-gradient(135deg, #2c3e50, #34495e);
-  border: 2px solid #3498db;
+  background: #4a5568;
+  border: 1px solid #3a4558;
 }
 
 .card.hidden::after {
-  content: '🎩';
-  font-size: 28px;
+  content: '♠';
+  font-size: 24px;
+  color: rgba(255,255,255,0.6);
 }
 
 /* 动画 */
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
+  from { opacity: 0; transform: translateY(8px); }
   to { opacity: 1; transform: translateY(0); }
 }
 
 @keyframes slideUp {
-  from { opacity: 0; transform: translateY(30px); }
+  from { opacity: 0; transform: translateY(20px); }
   to { opacity: 1; transform: translateY(0); }
 }
 
-@keyframes pulse {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.05); }
-}
-
 @keyframes dealCard {
-  from { opacity: 0; transform: translateY(-50px) rotate(-10deg); }
+  from { opacity: 0; transform: translateY(-30px) rotate(-5deg); }
   to { opacity: 1; transform: translateY(0) rotate(0); }
 }
 
 .fade-in {
-  animation: fadeIn 0.3s ease forwards;
+  animation: fadeIn 0.25s ease forwards;
 }
 
 .slide-up {
-  animation: slideUp 0.4s ease forwards;
-}
-
-.pulse {
-  animation: pulse 2s ease-in-out infinite;
+  animation: slideUp 0.3s ease forwards;
 }
 
 .deal-card {
-  animation: dealCard 0.4s ease forwards;
+  animation: dealCard 0.3s ease forwards;
+}
+
+/* 滚动条 */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--text-muted);
+  border-radius: 3px;
 }

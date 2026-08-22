@@ -1,5 +1,5 @@
 /**
- * 帽子21点 - 游戏操作组件 (React Native Web)
+ * 帽子21点 - 游戏操作 (自然风格)
  */
 
 import React from 'react';
@@ -13,7 +13,6 @@ const GameActions = ({ gameState, playerId }) => {
   const isMyTurn = gameState?.currentTurn === playerId;
   const canDouble = player?.cards?.length === 2 && player?.chips >= player?.bet;
   
-  // 计算手牌点数
   const calcHand = (cards) => {
     if (!cards) return 0;
     let total = 0, aces = 0;
@@ -26,51 +25,43 @@ const GameActions = ({ gameState, playerId }) => {
     return total;
   };
   
-  // 游戏结束 - 显示下一轮
   if (gameState?.state === 'finished') {
     return (
       <View style={styles.container}>
         <TouchableOpacity style={styles.nextBtn} onPress={nextRound}>
-          <Text style={styles.nextBtnText}>🔄 下一轮</Text>
+          <Text style={styles.nextText}>下一轮</Text>
         </TouchableOpacity>
       </View>
     );
   }
 
-  // 不是我的回合
   if (!isMyTurn || !player) {
     return (
       <View style={styles.container}>
-        <View style={styles.waiting}>
-          <View style={styles.waitingDot} />
-          <Text style={styles.waitingText}>等待其他玩家...</Text>
-        </View>
+        <Text style={styles.waiting}>等待中...</Text>
       </View>
     );
   }
 
   return (
     <View style={styles.container}>
-      <View style={styles.actions}>
+      <View style={styles.row}>
         <TouchableOpacity style={styles.hitBtn} onPress={hit}>
-          <Text style={styles.actionIcon}>🎯</Text>
-          <Text style={styles.actionText}>要牌</Text>
+          <Text style={styles.btnText}>要牌</Text>
         </TouchableOpacity>
         
         <TouchableOpacity style={styles.standBtn} onPress={stand}>
-          <Text style={styles.actionIcon}>✋</Text>
-          <Text style={styles.actionText}>停牌</Text>
+          <Text style={styles.btnText}>停牌</Text>
         </TouchableOpacity>
         
         {canDouble && (
           <TouchableOpacity style={styles.doubleBtn} onPress={doubleDown}>
-            <Text style={styles.actionIcon}>💰</Text>
-            <Text style={styles.actionText}>加倍</Text>
+            <Text style={styles.btnText}>加倍</Text>
           </TouchableOpacity>
         )}
       </View>
       
-      <Text style={styles.hint}>当前点数: {calcHand(player.cards)}</Text>
+      <Text style={styles.hint}>点数: {calcHand(player.cards)}</Text>
     </View>
   );
 };
@@ -79,84 +70,61 @@ const styles = StyleSheet.create({
   container: {
     padding: 16,
     backgroundColor: 'white',
-    borderTopLeftRadius: 16,
-    borderTopRightRadius: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: -4 },
-    shadowOpacity: 0.06,
-    shadowRadius: 16,
-    elevation: 4,
+    borderTopWidth: 1,
+    borderTopColor: '#e8e2d8',
   },
-  actions: {
+  row: {
     flexDirection: 'row',
     gap: 10,
-    marginBottom: 8,
+    marginBottom: 6,
   },
   hitBtn: {
     flex: 1,
-    paddingVertical: 14,
-    backgroundColor: '#2ecc71',
-    borderRadius: 12,
+    paddingVertical: 13,
+    backgroundColor: '#5b8c5a',
+    borderRadius: 8,
     alignItems: 'center',
-    gap: 4,
   },
   standBtn: {
     flex: 1,
-    paddingVertical: 14,
-    backgroundColor: '#e74c3c',
-    borderRadius: 12,
+    paddingVertical: 13,
+    backgroundColor: '#c9584a',
+    borderRadius: 8,
     alignItems: 'center',
-    gap: 4,
   },
   doubleBtn: {
     flex: 1,
-    paddingVertical: 14,
-    backgroundColor: '#f39c12',
-    borderRadius: 12,
+    paddingVertical: 13,
+    backgroundColor: '#c4945c',
+    borderRadius: 8,
     alignItems: 'center',
-    gap: 4,
   },
-  actionIcon: {
-    fontSize: 20,
-  },
-  actionText: {
+  btnText: {
     color: 'white',
-    fontSize: 15,
-    fontWeight: '700',
+    fontSize: 14,
+    fontWeight: '600',
   },
   hint: {
     textAlign: 'center',
-    fontSize: 13,
-    color: '#6c757d',
-    marginTop: 8,
+    fontSize: 12,
+    color: '#a89f94',
   },
   nextBtn: {
-    paddingVertical: 16,
-    backgroundColor: '#3498db',
-    borderRadius: 12,
+    paddingVertical: 14,
+    backgroundColor: '#5a7d9a',
+    borderRadius: 8,
     alignItems: 'center',
   },
-  nextBtnText: {
+  nextText: {
     color: 'white',
-    fontSize: 16,
-    fontWeight: '700',
+    fontSize: 15,
+    fontWeight: '600',
   },
   waiting: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 10,
-    paddingVertical: 12,
-  },
-  waitingDot: {
-    width: 10,
-    height: 10,
-    borderRadius: 5,
-    backgroundColor: '#f39c12',
-  },
-  waitingText: {
-    color: '#6c757d',
+    textAlign: 'center',
+    color: '#a89f94',
     fontSize: 14,
+    paddingVertical: 8,
   },
 });
 

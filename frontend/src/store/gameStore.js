@@ -5,9 +5,9 @@
 import { create } from 'zustand';
 import { io } from 'socket.io-client';
 
-const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || window.location.hostname
-  ? `${window.location.protocol}//${window.location.hostname}:60215`
-  : 'http://localhost:60215';
+// 服务器地址 - App运行时使用服务器IP，开发时使用本地
+const SERVER_HOST = import.meta.env.VITE_SERVER_HOST || '120.48.13.152';
+const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || `http://${SERVER_HOST}:60215`;
 
 const useGameStore = create((set, get) => ({
   // 玩家信息

@@ -1,9 +1,9 @@
 /**
- * 帽子21点 - 首页/登录页 (React Native Web)
+ * 帽子21点 - 首页/登录页 (自然风格)
  */
 
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image } from '../rnw';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet } from '../rnw';
 import useGameStore from '../store/gameStore';
 
 const HomeScreen = () => {
@@ -21,24 +21,26 @@ const HomeScreen = () => {
       <View style={styles.content}>
         {/* Logo区域 */}
         <View style={styles.logoArea}>
-          <Text style={styles.logoIcon}>🎩</Text>
+          <View style={styles.logoBox}>
+            <Text style={styles.logoEmoji}>♠</Text>
+          </View>
           <Text style={styles.title}>帽子21点</Text>
-          <Text style={styles.subtitle}>经典扑克 · 策略对战</Text>
+          <Text style={styles.subtitle}>Blackjack</Text>
         </View>
 
-        {/* 功能特点 */}
-        <View style={styles.features}>
-          <View style={styles.feature}>
-            <Text style={styles.featureIcon}>🤖</Text>
-            <Text style={styles.featureText}>人机对战</Text>
+        {/* 功能卡片 */}
+        <View style={styles.featureRow}>
+          <View style={styles.featureItem}>
+            <Text style={styles.featureEmoji}>🤖</Text>
+            <Text style={styles.featureLabel}>人机</Text>
           </View>
-          <View style={styles.feature}>
-            <Text style={styles.featureIcon}>⚔️</Text>
-            <Text style={styles.featureText}>1V1匹配</Text>
+          <View style={styles.featureItem}>
+            <Text style={styles.featureEmoji}>⚔️</Text>
+            <Text style={styles.featureLabel}>对战</Text>
           </View>
-          <View style={styles.feature}>
-            <Text style={styles.featureIcon}>💰</Text>
-            <Text style={styles.featureText}>策略下注</Text>
+          <View style={styles.featureItem}>
+            <Text style={styles.featureEmoji}>🎰</Text>
+            <Text style={styles.featureLabel}>下注</Text>
           </View>
         </View>
 
@@ -46,22 +48,21 @@ const HomeScreen = () => {
         <View style={styles.inputArea}>
           <TextInput
             style={styles.input}
-            placeholder="请输入你的昵称"
+            placeholder="输入你的昵称"
+            placeholderTextColor="#a89f94"
             value={name}
             onChangeText={setName}
             maxLength={10}
             onSubmitEditing={handleStart}
           />
           <TouchableOpacity style={styles.startBtn} onPress={handleStart}>
-            <Text style={styles.startBtnText}>开始游戏</Text>
+            <Text style={styles.startBtnText}>开始</Text>
           </TouchableOpacity>
         </View>
 
-        {/* 规则说明 */}
-        <View style={styles.rules}>
-          <Text style={styles.ruleText}>🎯 目标：点数接近21点但不超过</Text>
-          <Text style={styles.ruleText}>💵 初始金币：1000分</Text>
-          <Text style={styles.ruleText}>🎲 操作：下注、跟注、加注、梭哈</Text>
+        {/* 底部信息 */}
+        <View style={styles.footer}>
+          <Text style={styles.footerText}>起始筹码 1000 · 经典21点规则</Text>
         </View>
       </View>
     </View>
@@ -72,59 +73,65 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center',
-    backgroundColor: '#f8f9fa',
-    paddingHorizontal: 20,
+    backgroundColor: '#f5f3f0',
+    paddingHorizontal: 24,
   },
   content: {
     width: '100%',
-    maxWidth: 400,
+    maxWidth: 360,
     alignSelf: 'center',
     alignItems: 'center',
-    gap: 24,
+    gap: 28,
   },
   logoArea: {
     alignItems: 'center',
+    gap: 8,
   },
-  logoIcon: {
-    fontSize: 72,
-    marginBottom: 8,
+  logoBox: {
+    width: 72,
+    height: 72,
+    borderRadius: 16,
+    backgroundColor: '#2c2418',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 4,
+  },
+  logoEmoji: {
+    fontSize: 36,
+    color: '#f5f3f0',
   },
   title: {
-    fontSize: 36,
-    fontWeight: '800',
-    color: '#1a1a2e',
+    fontSize: 28,
+    fontWeight: '700',
+    color: '#2c2418',
     letterSpacing: 2,
   },
   subtitle: {
-    fontSize: 14,
-    color: '#6c757d',
-    marginTop: 4,
+    fontSize: 13,
+    color: '#a89f94',
+    letterSpacing: 4,
+    textTransform: 'uppercase',
   },
-  features: {
+  featureRow: {
     flexDirection: 'row',
     gap: 16,
-    justifyContent: 'center',
-    width: '100%',
   },
-  feature: {
+  featureItem: {
     alignItems: 'center',
-    gap: 6,
-    paddingVertical: 12,
-    paddingHorizontal: 16,
+    gap: 4,
+    paddingVertical: 10,
+    paddingHorizontal: 18,
     backgroundColor: 'white',
-    borderRadius: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.06,
-    shadowRadius: 8,
-    elevation: 2,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: '#e8e2d8',
   },
-  featureIcon: {
-    fontSize: 24,
+  featureEmoji: {
+    fontSize: 20,
   },
-  featureText: {
+  featureLabel: {
     fontSize: 12,
-    color: '#6c757d',
+    color: '#7a7068',
     fontWeight: '500',
   },
   inputArea: {
@@ -134,41 +141,35 @@ const styles = StyleSheet.create({
   input: {
     width: '100%',
     paddingVertical: 14,
-    paddingHorizontal: 18,
-    borderWidth: 2,
-    borderColor: '#e9ecef',
-    borderRadius: 12,
-    fontSize: 16,
+    paddingHorizontal: 16,
     backgroundColor: 'white',
+    borderWidth: 1.5,
+    borderColor: '#e8e2d8',
+    borderRadius: 10,
+    fontSize: 16,
+    color: '#2c2418',
     outlineStyle: 'none',
   },
   startBtn: {
     width: '100%',
-    paddingVertical: 16,
-    backgroundColor: '#2ecc71',
-    borderRadius: 12,
+    paddingVertical: 15,
+    backgroundColor: '#5b8c5a',
+    borderRadius: 10,
     alignItems: 'center',
-    shadowColor: '#2ecc71',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 12,
-    elevation: 4,
   },
   startBtnText: {
     color: 'white',
-    fontSize: 18,
-    fontWeight: '700',
+    fontSize: 16,
+    fontWeight: '600',
+    letterSpacing: 2,
   },
-  rules: {
-    width: '100%',
-    padding: 16,
-    backgroundColor: 'rgba(255,255,255,0.8)',
-    borderRadius: 12,
+  footer: {
+    marginTop: 8,
   },
-  ruleText: {
-    fontSize: 13,
-    color: '#6c757d',
-    lineHeight: 2,
+  footerText: {
+    fontSize: 12,
+    color: '#a89f94',
+    letterSpacing: 0.5,
   },
 });
 

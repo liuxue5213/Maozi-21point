@@ -1,5 +1,5 @@
 /**
- * 帽子21点 - 下注控制组件 (React Native Web)
+ * 帽子21点 - 下注控制 (自然风格)
  */
 
 import React, { useState } from 'react';
@@ -8,7 +8,7 @@ import useGameStore from '../store/gameStore';
 
 const BettingControls = ({ gameState, playerId }) => {
   const { placeBet } = useGameStore();
-  const [customBet, setCustomBet] = useState(50);
+  const [amount, setAmount] = useState(50);
   
   const player = gameState?.players?.find(p => p.id === playerId);
   const minBet = gameState?.minBet || 10;
@@ -16,46 +16,42 @@ const BettingControls = ({ gameState, playerId }) => {
   
   if (!player) return null;
 
-  const quickBets = [
-    { label: String(minBet), value: minBet },
-    { label: String(minBet * 5), value: minBet * 5 },
-    { label: String(minBet * 10), value: minBet * 10 },
-    { label: '梭哈', value: player.chips },
-  ];
+  const quickBets = [minBet, minBet * 5, minBet * 10, player.chips];
+  const labels = ['最小', '5x', '10x', '梭哈'];
 
   return (
     <View style={styles.container}>
       <View style={styles.infoRow}>
         <Text style={styles.chips}>💰 {player.chips}</Text>
-        <Text style={styles.currentBet}>当前下注: {player.totalBet}</Text>
+        <Text style={styles.bet}>已下注: {player.totalBet}</Text>
       </View>
       
-      <View style={styles.quickBets}>
-        {quickBets.map((bet, i) => (
+      <View style={styles.quickRow}>
+        {quickBets.map((val, i) => (
           <TouchableOpacity
             key={i}
-            style={[styles.quickBetBtn, (bet.value > player.chips || bet.value < minBet) && styles.disabledBtn]}
-            onPress={() => placeBet(bet.value)}
-            disabled={bet.value > player.chips || bet.value < minBet}
+            style={[styles.quickBtn, val > player.chips && styles.disabled]}
+            onPress={() => placeBet(val)}
+            disabled={val > player.chips || val < minBet}
           >
-            <Text style={styles.quickBetText}>{bet.label}</Text>
+            <Text style={styles.quickLabel}>{labels[i]}</Text>
+            <Text style={styles.quickVal}>{val > player.chips ? '-' : val}</Text>
           </TouchableOpacity>
         ))}
       </View>
 
-      <View style={styles.customBet}>
-        <View style={styles.sliderRow}>
-          <Text style={styles.sliderLabel}>下注: </Text>
-          <View style={styles.sliderTrack}>
-            <View style={[styles.sliderFill, { width: `${(customBet / Math.min(maxBet, player.chips)) * 100}%` }]} />
-          </View>
-          <Text style={styles.customAmount}>{customBet}</Text>
+      <View style={styles.customRow}>
+        <View style={styles.amountBox}>
+          <TouchableOpacity onPress={() => setAmount(Math.max(minBet, amount - 10))}>
+            <Text style={styles.adjustBtn}>−</Text>
+          </TouchableOpacity>
+          <Text style={styles.amountText}>{amount}</Text>
+          <TouchableOpacity onPress={() => setAmount(Math.min(player.chips, amount + 10))}>
+            <Text style={styles.adjustBtn}>+</Text>
+          </TouchableOpacity>
         </View>
-        <TouchableOpacity
-          style={styles.confirmBtn}
-          onPress={() => placeBet(customBet)}
-        >
-          <Text style={styles.confirmBtnText}>确认下注</Text>
+        <TouchableOpacity style={styles.confirmBtn} onPress={() => placeBet(amount)}>
+          <Text style={styles.confirmText}>下注</Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -66,13 +62,8 @@ const styles = StyleSheet.create({
   container: {
     padding: 16,
     backgroundColor: 'white',
-    borderTopLeftRadius: 16,
-    borderTopRightRadius: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: -4 },
-    shadowOpacity: 0.06,
-    shadowRadius: 16,
-    elevation: 4,
+    borderTopWidth: 1,
+    borderTopColor: '#e8e2d8',
   },
   infoRow: {
     flexDirection: 'row',
@@ -80,76 +71,73 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   chips: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: '#f39c12',
+    fontSize: 15,
+    fontWeight: '600',
+    color: '#c4945c',
   },
-  currentBet: {
-    fontSize: 14,
-    color: '#6c757d',
+  bet: {
+    fontSize: 13,
+    color: '#a89f94',
   },
-  quickBets: {
+  quickRow: {
     flexDirection: 'row',
     gap: 8,
     marginBottom: 12,
   },
-  quickBetBtn: {
+  quickBtn: {
     flex: 1,
     paddingVertical: 10,
-    backgroundColor: '#e8fdf5',
-    borderWidth: 2,
-    borderColor: '#2ecc71',
+    backgroundColor: '#f5f3f0',
     borderRadius: 8,
     alignItems: 'center',
+    gap: 2,
   },
-  disabledBtn: {
+  disabled: {
     opacity: 0.4,
   },
-  quickBetText: {
-    fontSize: 13,
+  quickLabel: {
+    fontSize: 10,
+    color: '#a89f94',
+  },
+  quickVal: {
+    fontSize: 14,
     fontWeight: '600',
-    color: '#27ae60',
+    color: '#2c2418',
   },
-  customBet: {
-    gap: 8,
+  customRow: {
+    flexDirection: 'row',
+    gap: 10,
+    alignItems: 'center',
   },
-  sliderRow: {
+  amountBox: {
+    flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
+    justifyContent: 'space-between',
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    backgroundColor: '#f5f3f0',
+    borderRadius: 8,
   },
-  sliderLabel: {
-    fontSize: 14,
-    color: '#6c757d',
+  adjustBtn: {
+    fontSize: 20,
+    color: '#7a7068',
+    paddingHorizontal: 4,
   },
-  sliderTrack: {
-    flex: 1,
-    height: 6,
-    backgroundColor: '#e9ecef',
-    borderRadius: 3,
-    overflow: 'hidden',
-  },
-  sliderFill: {
-    height: '100%',
-    backgroundColor: '#2ecc71',
-    borderRadius: 3,
-  },
-  customAmount: {
+  amountText: {
     fontSize: 18,
     fontWeight: '700',
-    color: '#1a1a2e',
-    minWidth: 40,
-    textAlign: 'right',
+    color: '#2c2418',
   },
   confirmBtn: {
     paddingVertical: 12,
-    backgroundColor: '#2ecc71',
+    paddingHorizontal: 24,
+    backgroundColor: '#5b8c5a',
     borderRadius: 8,
-    alignItems: 'center',
   },
-  confirmBtnText: {
+  confirmText: {
     color: 'white',
-    fontSize: 14,
+    fontSize: 15,
     fontWeight: '600',
   },
 });

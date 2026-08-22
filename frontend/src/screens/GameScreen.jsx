@@ -1,5 +1,5 @@
 /**
- * 帽子21点 - 游戏主界面 (React Native Web)
+ * 帽子21点 - 游戏主界面 (自然风格)
  */
 
 import React from 'react';
@@ -15,8 +15,7 @@ const GameScreen = () => {
   if (!gameState) {
     return (
       <View style={styles.loading}>
-        <Text style={styles.loadingIcon}>🎩</Text>
-        <Text style={styles.loadingText}>正在加载游戏...</Text>
+        <Text style={styles.loadingText}>加载中...</Text>
       </View>
     );
   }
@@ -28,28 +27,6 @@ const GameScreen = () => {
   const isFinished = gameState.state === 'finished';
   const isDealerTurn = gameState.state === 'dealer';
 
-  // 获取结果文本
-  const getResultText = (result) => {
-    switch (result) {
-      case 'win': return '🎉 赢了!';
-      case 'lose': return '😢 输了';
-      case 'push': return '🤝 平局';
-      case 'blackjack': return '🎰 BLACKJACK!';
-      default: return '';
-    }
-  };
-
-  const getResultColor = (result) => {
-    switch (result) {
-      case 'win': return '#2ecc71';
-      case 'lose': return '#e74c3c';
-      case 'push': return '#f39c12';
-      case 'blackjack': return '#9b59b6';
-      default: return '#6c757d';
-    }
-  };
-
-  // 计算手牌点数
   const calcHand = (cards) => {
     if (!cards) return 0;
     let total = 0, aces = 0;
@@ -62,89 +39,81 @@ const GameScreen = () => {
     return total;
   };
 
+  const getResultText = (result) => {
+    switch (result) {
+      case 'win': return '获胜';
+      case 'lose': return '失败';
+      case 'push': return '平局';
+      case 'blackjack': return 'Blackjack!';
+      default: return '';
+    }
+  };
+
+  const getResultColor = (result) => {
+    switch (result) {
+      case 'win': return '#5b8c5a';
+      case 'lose': return '#c9584a';
+      case 'push': return '#c4945c';
+      case 'blackjack': return '#8b5cf6';
+      default: return '#a89f94';
+    }
+  };
+
   return (
     <View style={styles.container}>
       {/* 顶部栏 */}
       <View style={styles.header}>
         <TouchableOpacity style={styles.backBtn} onPress={backToLobby}>
-          <Text style={styles.backBtnText}>← 退出</Text>
+          <Text style={styles.backBtnText}>←</Text>
         </TouchableOpacity>
-        <View style={styles.gameInfo}>
-          <View style={styles.roundBadge}>
-            <Text style={styles.roundText}>第 {gameState.round} 轮</Text>
-          </View>
-          <Text style={styles.modeText}>{gameMode === 'pve' ? '🤖 人机对战' : '⚔️ 1V1对战'}</Text>
+        <View style={styles.headerCenter}>
+          <Text style={styles.roundText}>第{gameState.round}轮</Text>
+          <Text style={styles.modeText}>{gameMode === 'pve' ? '人机' : '1V1'}</Text>
         </View>
-        <Text style={styles.chips}>💰 {me?.chips || 0}</Text>
+        <Text style={styles.chips}>💰{me?.chips || 0}</Text>
       </View>
 
       {/* 游戏桌面 */}
       <ScrollView style={styles.table} contentContainerStyle={styles.tableContent}>
-        {/* 庄家区域 */}
+        {/* 庄家 */}
         <View style={styles.dealerArea}>
-          <Hand
-            cards={gameState.dealer.cards}
-            score={gameState.dealer.score}
-            label="庄家"
-          />
+          <Hand cards={gameState.dealer.cards} score={gameState.dealer.score} label="庄家" />
         </View>
 
-        {/* 中央信息 */}
-        <View style={styles.centerInfo}>
-          {isBetting && (
-            <View style={[styles.statusBadge, { backgroundColor: '#d4edda' }]}>
-              <Text style={styles.statusText}>🎲 请下注</Text>
-            </View>
-          )}
-          {isPlaying && (
-            <View style={[styles.statusBadge, { backgroundColor: '#d4edda' }]}>
-              <Text style={styles.statusText}>🎯 游戏中</Text>
-            </View>
-          )}
-          {isDealerTurn && (
-            <View style={[styles.statusBadge, { backgroundColor: '#fff3cd' }]}>
-              <Text style={styles.statusText}>🎩 庄家回合</Text>
-            </View>
-          )}
-          {isFinished && (
-            <View style={[styles.statusBadge, { backgroundColor: '#e2d5f1' }]}>
-              <Text style={styles.statusText}>🏁 本局结束</Text>
-            </View>
-          )}
+        {/* 状态 */}
+        <View style={styles.statusArea}>
+          {isBetting && <Text style={styles.statusText}>请下注</Text>}
+          {isPlaying && <Text style={styles.statusText}>游戏中</Text>}
+          {isDealerTurn && <Text style={styles.statusText}>庄家回合</Text>}
+          {isFinished && <Text style={styles.statusText}>本局结束</Text>}
         </View>
 
-        {/* 对手区域 */}
-        <View style={styles.opponentsArea}>
+        {/* 对手 */}
+        <View style={styles.opponents}>
           {opponents.map(opp => (
-            <View key={opp.id} style={styles.opponentCard}>
-              <View style={styles.opponentHeader}>
-                <Text style={styles.opponentName}>{opp.name}</Text>
-                <Text style={styles.opponentChips}>💰{opp.chips}</Text>
+            <View key={opp.id} style={styles.oppCard}>
+              <View style={styles.oppHeader}>
+                <Text style={styles.oppName}>{opp.name}</Text>
+                <Text style={styles.oppChips}>💰{opp.chips}</Text>
               </View>
-              <View style={styles.miniCards}>
-                {opp.cards.map((card, i) => (
-                  <View key={i} style={[styles.miniCard, i > 0 && { marginLeft: -16 }, card.hidden && styles.miniCardHidden]}>
-                    {!card.hidden && (
-                      <Text style={[styles.miniCardText, (card.suit === '♥' || card.suit === '♦') && { color: '#e74c3c' }]}>
-                        {card.rank}{card.suit}
+              <View style={styles.oppCards}>
+                {opp.cards.map((c, i) => (
+                  <View key={i} style={[styles.miniCard, c.hidden && styles.miniCardHidden]}>
+                    {!c.hidden && (
+                      <Text style={[styles.miniCardText, (c.suit === '♥' || c.suit === '♦') && { color: '#b83030' }]}>
+                        {c.rank}{c.suit}
                       </Text>
                     )}
-                    {card.hidden && <Text style={{ fontSize: 14 }}>🎩</Text>}
+                    {c.hidden && <Text style={{ fontSize: 12, color: 'rgba(255,255,255,0.6)' }}>♠</Text>}
                   </View>
                 ))}
               </View>
-              <View style={styles.opponentStatus}>
-                {opp.busted && <Text style={{ color: '#e74c3c' }}>💥 爆牌</Text>}
-                {opp.stood && <Text style={{ color: '#2ecc71' }}>✋ 停牌</Text>}
-                {opp.blackjack && <Text style={{ color: '#9b59b6' }}>🎰 BJ!</Text>}
-                {opp.result && (
-                  <Text style={{ color: getResultColor(opp.result), fontWeight: '700' }}>
-                    {getResultText(opp.result)}
-                  </Text>
-                )}
-                {opp.totalBet > 0 && (
-                  <Text style={styles.opponentBet}>下注: {opp.totalBet}</Text>
-                )}
+              <View style={styles.oppStatus}>
+                {opp.busted && <Text style={styles.oppStatusText}>爆牌</Text>}
+                {opp.stood && <Text style={styles.oppStatusText}>停牌</Text>}
+                {opp.blackjack && <Text style={[styles.oppStatusText, { color: '#8b5cf6' }]}>BJ!</Text>}
+                {opp.result && <Text style={[styles.oppStatusText, { color: getResultColor(opp.result) }]}>{getResultText(opp.result)}</Text>}
+                {opp.totalBet > 0 && <Text style={styles.oppBet}>下注:{opp.totalBet}</Text>}
               </View>
             </View>
           ))}
@@ -152,30 +121,17 @@ const GameScreen = () => {
 
         {/* 我的区域 */}
         <View style={styles.myArea}>
-          <Hand
-            cards={me?.cards || []}
-            score={calcHand(me?.cards || [])}
-            label="我"
-          />
-          {/* 我的结果 */}
+          <Hand cards={me?.cards || []} score={calcHand(me?.cards || [])} label="我" />
           {me?.result && (
-            <View style={[styles.resultBadge, { backgroundColor: me.result === 'win' || me.result === 'blackjack' ? '#e8fdf5' : '#fde8e8' }]}>
-              <Text style={[styles.resultText, { color: getResultColor(me.result) }]}>
-                {getResultText(me.result)}
-              </Text>
-              {me.winAmount > 0 && (
-                <Text style={[styles.winAmount, { color: getResultColor(me.result) }]}>+{me.winAmount}</Text>
-              )}
-            </View>
+            <Text style={[styles.resultText, { color: getResultColor(me.result) }]}>
+              {getResultText(me.result)} {me.winAmount > 0 && `+${me.winAmount}`}
+            </Text>
           )}
-          {/* 当前下注 */}
-          {me?.totalBet > 0 && (
-            <Text style={styles.myBet}>下注: {me.totalBet}</Text>
-          )}
+          {me?.totalBet > 0 && <Text style={styles.myBet}>下注: {me.totalBet}</Text>}
         </View>
       </ScrollView>
 
-      {/* 底部操作区 */}
+      {/* 底部操作 */}
       <View style={styles.controls}>
         {isBetting && <BettingControls gameState={gameState} playerId={playerId} />}
         {(isPlaying || isFinished || isDealerTurn) && <GameActions gameState={gameState} playerId={playerId} />}
@@ -187,20 +143,16 @@ const GameScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f0f2f5',
+    backgroundColor: '#f5f3f0',
   },
   loading: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 16,
-  },
-  loadingIcon: {
-    fontSize: 48,
   },
   loadingText: {
-    color: '#6c757d',
-    fontSize: 16,
+    color: '#a89f94',
+    fontSize: 15,
   },
   header: {
     flexDirection: 'row',
@@ -209,166 +161,134 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 12,
     backgroundColor: 'white',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.06,
-    shadowRadius: 8,
-    elevation: 2,
+    borderBottomWidth: 1,
+    borderBottomColor: '#e8e2d8',
   },
   backBtn: {
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-    backgroundColor: '#f8f9fa',
-    borderWidth: 1,
-    borderColor: '#e9ecef',
-    borderRadius: 8,
+    paddingVertical: 6,
+    paddingHorizontal: 10,
   },
   backBtnText: {
-    fontSize: 13,
-    color: '#6c757d',
+    fontSize: 20,
+    color: '#7a7068',
   },
-  gameInfo: {
-    flexDirection: 'row',
-    gap: 12,
+  headerCenter: {
     alignItems: 'center',
-  },
-  roundBadge: {
-    paddingVertical: 4,
-    paddingHorizontal: 10,
-    backgroundColor: '#e8fdf5',
-    borderRadius: 6,
+    gap: 2,
   },
   roundText: {
     fontSize: 12,
-    fontWeight: '600',
-    color: '#27ae60',
+    color: '#a89f94',
+    fontWeight: '500',
   },
   modeText: {
-    fontSize: 13,
-    fontWeight: '500',
-    color: '#6c757d',
+    fontSize: 11,
+    color: '#d0c8bc',
   },
   chips: {
     fontSize: 14,
-    fontWeight: '700',
-    color: '#f39c12',
+    fontWeight: '600',
+    color: '#c4945c',
   },
   table: {
     flex: 1,
   },
   tableContent: {
     padding: 16,
-    gap: 12,
+    gap: 10,
   },
   dealerArea: {
     alignItems: 'center',
+    paddingVertical: 8,
   },
-  centerInfo: {
+  statusArea: {
     alignItems: 'center',
   },
-  statusBadge: {
-    paddingVertical: 6,
-    paddingHorizontal: 16,
-    borderRadius: 20,
-  },
   statusText: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: '#155724',
-  },
-  opponentsArea: {
-    flexDirection: 'row',
-    gap: 12,
-    justifyContent: 'center',
-    flexWrap: 'wrap',
-  },
-  opponentCard: {
-    padding: 12,
+    fontSize: 12,
+    color: '#a89f94',
+    paddingVertical: 4,
+    paddingHorizontal: 12,
     backgroundColor: 'white',
     borderRadius: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.06,
-    shadowRadius: 8,
-    elevation: 2,
-    minWidth: 140,
+    overflow: 'hidden',
   },
-  opponentHeader: {
+  opponents: {
+    gap: 10,
+  },
+  oppCard: {
+    padding: 12,
+    backgroundColor: 'white',
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: '#e8e2d8',
+  },
+  oppHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginBottom: 8,
   },
-  opponentName: {
+  oppName: {
     fontSize: 13,
     fontWeight: '600',
-    color: '#1a1a2e',
+    color: '#2c2418',
   },
-  opponentChips: {
+  oppChips: {
     fontSize: 11,
-    color: '#f39c12',
+    color: '#c4945c',
   },
-  miniCards: {
+  oppCards: {
     flexDirection: 'row',
     justifyContent: 'center',
     marginBottom: 6,
   },
   miniCard: {
-    width: 36,
-    height: 50,
+    width: 32,
+    height: 44,
     borderRadius: 4,
     backgroundColor: 'white',
     borderWidth: 1,
-    borderColor: '#e9ecef',
+    borderColor: '#e8e2d8',
     alignItems: 'center',
     justifyContent: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.12,
-    shadowRadius: 4,
-    elevation: 1,
+    marginLeft: -8,
   },
   miniCardHidden: {
-    backgroundColor: '#2c3e50',
+    backgroundColor: '#4a5568',
+    borderWidth: 0,
   },
   miniCardText: {
-    fontSize: 12,
+    fontSize: 11,
     fontWeight: '700',
-    color: '#1a1a2e',
+    color: '#2c2418',
   },
-  opponentStatus: {
+  oppStatus: {
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    gap: 6,
-    fontSize: 12,
+    gap: 8,
   },
-  opponentBet: {
+  oppStatusText: {
     fontSize: 11,
-    color: '#6c757d',
+    color: '#7a7068',
+    fontWeight: '500',
+  },
+  oppBet: {
+    fontSize: 10,
+    color: '#d0c8bc',
   },
   myArea: {
     alignItems: 'center',
-    gap: 8,
-  },
-  resultBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
+    gap: 6,
     paddingVertical: 8,
-    paddingHorizontal: 20,
-    borderRadius: 20,
   },
   resultText: {
     fontSize: 16,
     fontWeight: '700',
   },
-  winAmount: {
-    fontSize: 18,
-    fontWeight: '800',
-  },
   myBet: {
-    fontSize: 13,
-    color: '#6c757d',
+    fontSize: 12,
+    color: '#a89f94',
   },
   controls: {
     flexShrink: 0,

@@ -1,9 +1,9 @@
 /**
- * 帽子21点 - 游戏大厅 (React Native Web)
+ * 帽子21点 - 游戏大厅 (自然风格)
  */
 
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from '../rnw';
+import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from '../rnw';
 import useGameStore from '../store/gameStore';
 
 const LobbyScreen = () => {
@@ -15,53 +15,53 @@ const LobbyScreen = () => {
       <View style={styles.header}>
         <View style={styles.playerInfo}>
           <View style={styles.avatar}>
-            <Text style={styles.avatarText}>🎩</Text>
+            <Text style={styles.avatarText}>♠</Text>
           </View>
           <View>
             <Text style={styles.playerName}>{playerName}</Text>
-            <Text style={styles.playerChips}>💰 1000 金币</Text>
+            <Text style={styles.playerChips}>💰 1000</Text>
           </View>
         </View>
-        <View style={[styles.status, { backgroundColor: connected ? '#d4edda' : '#f8d7da' }]}>
-          <View style={[styles.statusDot, { backgroundColor: connected ? '#2ecc71' : '#e74c3c' }]} />
-          <Text style={styles.statusText}>{connected ? '在线' : '离线'}</Text>
-        </View>
+        <View style={[styles.statusDot, { backgroundColor: connected ? '#5b8c5a' : '#c9584a' }]} />
       </View>
 
       {/* 主内容 */}
-      <View style={styles.content}>
-        <Text style={styles.sectionTitle}>选择游戏模式</Text>
+      <ScrollView style={styles.content} contentContainerStyle={styles.contentInner}>
+        <Text style={styles.label}>选择模式</Text>
         
-        {/* 人机对战卡片 */}
-        <TouchableOpacity style={styles.modeCard} onPress={startPvE}>
-          <Text style={styles.modeIcon}>🤖</Text>
-          <View style={styles.modeInfo}>
-            <Text style={styles.modeTitle}>人机对战</Text>
-            <Text style={styles.modeDesc}>与AI机器人一决高下</Text>
+        {/* 人机对战 */}
+        <TouchableOpacity style={styles.card} onPress={startPvE}>
+          <View style={styles.cardIcon}>
+            <Text style={styles.cardIconText}>🤖</Text>
           </View>
-          <Text style={styles.modeArrow}>→</Text>
+          <View style={styles.cardBody}>
+            <Text style={styles.cardTitle}>人机对战</Text>
+            <Text style={styles.cardDesc}>与AI即时对局</Text>
+          </View>
+          <Text style={styles.cardArrow}>→</Text>
         </TouchableOpacity>
 
-        {/* 1V1匹配卡片 */}
-        <TouchableOpacity style={[styles.modeCard, styles.pvpCard]} onPress={startMatch}>
-          <Text style={styles.modeIcon}>⚔️</Text>
-          <View style={styles.modeInfo}>
-            <Text style={styles.modeTitle}>1V1 匹配对战</Text>
-            <Text style={styles.modeDesc}>实时匹配真人玩家对战</Text>
+        {/* 1V1匹配 */}
+        <TouchableOpacity style={styles.card} onPress={startMatch}>
+          <View style={styles.cardIcon}>
+            <Text style={styles.cardIconText}>⚔️</Text>
           </View>
-          <Text style={styles.modeArrow}>→</Text>
+          <View style={styles.cardBody}>
+            <Text style={styles.cardTitle}>1V1 对战</Text>
+            <Text style={styles.cardDesc}>匹配真人玩家</Text>
+          </View>
+          <Text style={styles.cardArrow}>→</Text>
         </TouchableOpacity>
 
-        {/* 游戏说明 */}
-        <View style={styles.infoCard}>
-          <Text style={styles.infoTitle}>🎮 游戏规则</Text>
-          <Text style={styles.infoText}>• 每位玩家起始 1000 金币</Text>
-          <Text style={styles.infoText}>• 目标：手牌点数接近21点，但不能超过</Text>
-          <Text style={styles.infoText}>• J/Q/K = 10点，A = 1或11点</Text>
-          <Text style={styles.infoText}>• 支持：下注、跟注、加注、梭哈</Text>
-          <Text style={styles.infoText}>• Blackjack（首两张21点）1.5倍奖励</Text>
+        {/* 规则 */}
+        <View style={styles.rules}>
+          <Text style={styles.rulesTitle}>游戏规则</Text>
+          <Text style={styles.ruleItem}>• 目标：接近21点，不超过</Text>
+          <Text style={styles.ruleItem}>• A=1或11，J/Q/K=10</Text>
+          <Text style={styles.ruleItem}>• 操作：下注/跟注/加注/梭哈</Text>
+          <Text style={styles.ruleItem}>• Blackjack 1.5倍奖励</Text>
         </View>
-      </View>
+      </ScrollView>
     </View>
   );
 };
@@ -69,7 +69,7 @@ const LobbyScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f8f9fa',
+    backgroundColor: '#f5f3f0',
   },
   header: {
     flexDirection: 'row',
@@ -78,11 +78,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 16,
     backgroundColor: 'white',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.06,
-    shadowRadius: 8,
-    elevation: 2,
+    borderBottomWidth: 1,
+    borderBottomColor: '#e8e2d8',
   },
   playerInfo: {
     flexDirection: 'row',
@@ -90,110 +87,102 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   avatar: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    backgroundColor: '#667eea',
+    width: 40,
+    height: 40,
+    borderRadius: 10,
+    backgroundColor: '#2c2418',
     alignItems: 'center',
     justifyContent: 'center',
   },
   avatarText: {
-    fontSize: 20,
+    fontSize: 18,
+    color: '#f5f3f0',
   },
   playerName: {
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: '600',
-    color: '#1a1a2e',
+    color: '#2c2418',
   },
   playerChips: {
-    fontSize: 13,
-    color: '#f39c12',
-    fontWeight: '500',
-  },
-  status: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-    paddingVertical: 6,
-    paddingHorizontal: 12,
-    borderRadius: 20,
+    fontSize: 12,
+    color: '#c4945c',
+    marginTop: 2,
   },
   statusDot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-  },
-  statusText: {
-    fontSize: 12,
-    fontWeight: '500',
+    width: 10,
+    height: 10,
+    borderRadius: 5,
   },
   content: {
     flex: 1,
+  },
+  contentInner: {
     padding: 20,
-    gap: 16,
+    gap: 14,
   },
-  sectionTitle: {
-    fontSize: 20,
-    fontWeight: '700',
-    color: '#1a1a2e',
+  label: {
+    fontSize: 13,
+    fontWeight: '500',
+    color: '#a89f94',
+    textTransform: 'uppercase',
+    letterSpacing: 1,
   },
-  modeCard: {
+  card: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 16,
-    padding: 20,
-    backgroundColor: '#d4edda',
-    borderRadius: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.06,
-    shadowRadius: 12,
-    elevation: 2,
-  },
-  pvpCard: {
-    backgroundColor: '#f3e5ff',
-  },
-  modeIcon: {
-    fontSize: 40,
-  },
-  modeInfo: {
-    flex: 1,
-  },
-  modeTitle: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: '#1a1a2e',
-    marginBottom: 4,
-  },
-  modeDesc: {
-    fontSize: 13,
-    color: '#6c757d',
-  },
-  modeArrow: {
-    fontSize: 24,
-    color: '#6c757d',
-  },
-  infoCard: {
-    padding: 16,
+    gap: 14,
+    padding: 18,
     backgroundColor: 'white',
-    borderRadius: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.06,
-    shadowRadius: 8,
-    elevation: 2,
-    marginTop: 'auto',
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#e8e2d8',
   },
-  infoTitle: {
+  cardIcon: {
+    width: 44,
+    height: 44,
+    borderRadius: 10,
+    backgroundColor: '#f5f3f0',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  cardIconText: {
+    fontSize: 22,
+  },
+  cardBody: {
+    flex: 1,
+    gap: 3,
+  },
+  cardTitle: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#1a1a2e',
-    marginBottom: 12,
+    color: '#2c2418',
   },
-  infoText: {
+  cardDesc: {
     fontSize: 13,
-    color: '#6c757d',
-    lineHeight: 2,
+    color: '#a89f94',
+  },
+  cardArrow: {
+    fontSize: 18,
+    color: '#d0c8bc',
+  },
+  rules: {
+    marginTop: 12,
+    padding: 16,
+    backgroundColor: '#faf9f7',
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#f0ebe4',
+  },
+  rulesTitle: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: '#7a7068',
+    marginBottom: 10,
+  },
+  ruleItem: {
+    fontSize: 13,
+    color: '#a89f94',
+    lineHeight: 1.9,
   },
 });
 
