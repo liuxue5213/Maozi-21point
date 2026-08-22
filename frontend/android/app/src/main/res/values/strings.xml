@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">帽子21点</string>
+    <string name="title_activity_main">帽子21点</string>
+    <string name="package_name">com.maozi.blackjack</string>
+    <string name="custom_url_scheme">com.maozi.blackjack</string>
+</resources>

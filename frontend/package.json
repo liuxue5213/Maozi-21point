@@ -1,0 +1,33 @@
+{
+  "name": "maozi-21point-frontend",
+  "version": "1.0.0",
+  "description": "帽子21点前端 (React Native Web + Capacitor)",
+  "private": true,
+  "scripts": {
+    "dev": "vite --host 0.0.0.0 --port 60210",
+    "build": "vite build",
+    "preview": "vite preview --host 0.0.0.0 --port 60210",
+    "cap:sync": "cap sync",
+    "cap:android": "cap sync android && cap open android",
+    "cap:ios": "cap sync ios && cap open ios",
+    "cap:build:android": "npm run build && cap sync android && cd android && ./gradlew assembleRelease",
+    "android:build": "npm run build && npx cap sync android && cd android && ./gradlew assembleDebug"
+  },
+  "dependencies": {
+    "@capacitor/android": "^8.5.0",
+    "@capacitor/ios": "^8.5.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-native-web": "^0.21.2",
+    "react-router-dom": "^6.20.0",
+    "socket.io-client": "^4.7.2",
+    "zustand": "^4.4.7"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^8.5.0",
+    "@capacitor/core": "^8.5.0",
+    "@vitejs/plugin-react": "^4.2.1",
+    "typescript": "^7.0.2",
+    "vite": "^5.0.0"
+  }
+}

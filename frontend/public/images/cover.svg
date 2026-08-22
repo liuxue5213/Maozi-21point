@@ -1,0 +1,124 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600">
+  <defs>
+    <!-- 背景渐变 -->
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#f8f9fa"/>
+      <stop offset="50%" style="stop-color:#e9ecef"/>
+      <stop offset="100%" style="stop-color:#dee2e6"/>
+    </linearGradient>
+    
+    <!-- 帽子渐变 -->
+    <linearGradient id="hatGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#2c3e50"/>
+      <stop offset="100%" style="stop-color:#1a1a2e"/>
+    </linearGradient>
+    
+    <!-- 金色渐变 -->
+    <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#f39c12"/>
+      <stop offset="50%" style="stop-color:#f1c40f"/>
+      <stop offset="100%" style="stop-color:#f39c12"/>
+    </linearGradient>
+    
+    <!-- 卡牌阴影 -->
+    <filter id="cardShadow">
+      <feDropShadow dx="0" dy="4" stdDeviation="4" flood-opacity="0.15"/>
+    </filter>
+    
+    <!-- 文字阴影 -->
+    <filter id="textShadow">
+      <feDropShadow dx="0" dy="2" stdDeviation="2" flood-opacity="0.2"/>
+    </filter>
+  </defs>
+  
+  <!-- 背景 -->
+  <rect width="800" height="600" fill="url(#bgGrad)"/>
+  
+  <!-- 装饰圆 -->
+  <circle cx="700" cy="100" r="150" fill="#e8fdf5" opacity="0.5"/>
+  <circle cx="100" cy="500" r="120" fill="#fff3ff" opacity="0.5"/>
+  <circle cx="400" cy="300" r="200" fill="#d4edda" opacity="0.2"/>
+  
+  <!-- 扑克牌装饰 - 左上角 -->
+  <g transform="translate(80, 100) rotate(-15)" filter="url(#cardShadow)">
+    <rect width="70" height="100" rx="8" fill="white" stroke="#e9ecef" stroke-width="1"/>
+    <text x="10" y="22" font-size="16" font-weight="bold" fill="#e74c3c">A</text>
+    <text x="35" y="60" font-size="32" text-anchor="middle" fill="#e74c3c">♥</text>
+    <text x="60" y="92" font-size="16" font-weight="bold" fill="#e74c3c" text-anchor="end">A</text>
+  </g>
+  
+  <!-- 扑克牌装饰 - 右上角 -->
+  <g transform="translate(650, 80) rotate(10)" filter="url(#cardShadow)">
+    <rect width="70" height="100" rx="8" fill="white" stroke="#e9ecef" stroke-width="1"/>
+    <text x="10" y="22" font-size="16" font-weight="bold" fill="#1a1a2e">K</text>
+    <text x="35" y="60" font-size="32" text-anchor="middle" fill="#1a1a2e">♠</text>
+    <text x="60" y="92" font-size="16" font-weight="bold" fill="#1a1a2e" text-anchor="end">K</text>
+  </g>
+  
+  <!-- 扑克牌装饰 - 左下角 -->
+  <g transform="translate(60, 420) rotate(-8)" filter="url(#cardShadow)">
+    <rect width="70" height="100" rx="8" fill="white" stroke="#e9ecef" stroke-width="1"/>
+    <text x="10" y="22" font-size="16" font-weight="bold" fill="#1a1a2e">Q</text>
+    <text x="35" y="60" font-size="32" text-anchor="middle" fill="#1a1a2e">♣</text>
+    <text x="60" y="92" font-size="16" font-weight="bold" fill="#1a1a2e" text-anchor="end">Q</text>
+  </g>
+  
+  <!-- 扑克牌装饰 - 右下角 -->
+  <g transform="translate(680, 440) rotate(12)" filter="url(#cardShadow)">
+    <rect width="70" height="100" rx="8" fill="white" stroke="#e9ecef" stroke-width="1"/>
+    <text x="10" y="22" font-size="16" font-weight="bold" fill="#e74c3c">J</text>
+    <text x="35" y="60" font-size="32" text-anchor="middle" fill="#e74c3c">♦</text>
+    <text x="60" y="92" font-size="16" font-weight="bold" fill="#e74c3c" text-anchor="end">J</text>
+  </g>
+  
+  <!-- 中央帽子图标 -->
+  <g transform="translate(400, 220)">
+    <!-- 帽子帽檐 -->
+    <ellipse cx="0" cy="40" rx="100" ry="20" fill="url(#hatGrad)" filter="url(#textShadow)"/>
+    <!-- 帽子主体 -->
+    <path d="M -70 40 Q -70 -20 0 -30 Q 70 -20 70 40 L 70 55 Q 0 65 -70 55 Z" fill="url(#hatGrad)" filter="url(#textShadow)"/>
+    <!-- 帽子装饰带 -->
+    <rect x="-70" y="42" width="140" height="18" rx="4" fill="#e74c3c"/>
+    <!-- 帽子顶部装饰 -->
+    <ellipse cx="0" cy="-28" rx="15" ry="8" fill="#c0392b"/>
+  </g>
+  
+  <!-- 主标题 -->
+  <text x="400" y="360" text-anchor="middle" font-family="Arial, sans-serif" font-size="72" font-weight="900" fill="#1a1a2e" filter="url(#textShadow)">帽子21点</text>
+  
+  <!-- 副标题 -->
+  <text x="400" y="400" text-anchor="middle" font-family="Arial, sans-serif" font-size="22" fill="#6c757d" letter-spacing="8">CLASSIC BLACKJACK</text>
+  
+  <!-- 装饰线 -->
+  <line x1="250" y1="420" x2="550" y2="420" stroke="url(#goldGrad)" stroke-width="3" stroke-linecap="round"/>
+  
+  <!-- 功能标签 -->
+  <g transform="translate(400, 460)">
+    <!-- 人机对战 -->
+    <g transform="translate(-160, 0)">
+      <rect x="-50" y="-15" width="100" height="30" rx="15" fill="#e8fdf5" stroke="#2ecc71" stroke-width="1"/>
+      <text x="0" y="5" text-anchor="middle" font-size="14" fill="#27ae60" font-weight="600">🤖 人机对战</text>
+    </g>
+    <!-- 1V1匹配 -->
+    <g transform="translate(0, 0)">
+      <rect x="-55" y="-15" width="110" height="30" rx="15" fill="#fff3ff" stroke="#9b59b6" stroke-width="1"/>
+      <text x="0" y="5" text-anchor="middle" font-size="14" fill="#8e44ad" font-weight="600">⚔️ 1V1匹配</text>
+    </g>
+    <!-- 策略下注 -->
+    <g transform="translate(160, 0)">
+      <rect x="-50" y="-15" width="100" height="30" rx="15" fill="#fff8e1" stroke="#f39c12" stroke-width="1"/>
+      <text x="0" y="5" text-anchor="middle" font-size="14" fill="#e67e22" font-weight="600">💰 策略下注</text>
+    </g>
+  </g>
+  
+  <!-- 底部装饰 - 扑克牌图案 -->
+  <g transform="translate(400, 540)">
+    <text x="0" y="0" text-anchor="middle" font-size="28" opacity="0.3">♠ ♥ ♦ ♣ ♠ ♥ ♦ ♣</text>
+  </g>
+  
+  <!-- 21点标志 -->
+  <g transform="translate(400, 130)">
+    <circle r="30" fill="none" stroke="#f39c12" stroke-width="3" opacity="0.6"/>
+    <text x="0" y="8" text-anchor="middle" font-size="22" font-weight="bold" fill="#f39c12">21</text>
+  </g>
+</svg>

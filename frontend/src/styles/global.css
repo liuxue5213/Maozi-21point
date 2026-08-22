@@ -1,0 +1,179 @@
+/* 帽子21点 - 全局样式 - 浅色主题 */
+
+:root {
+  --bg-primary: #f8f9fa;
+  --bg-secondary: #ffffff;
+  --bg-card: #ffffff;
+  --text-primary: #1a1a2e;
+  --text-secondary: #6c757d;
+  --accent-green: #2ecc71;
+  --accent-red: #e74c3c;
+  --accent-gold: #f39c12;
+  --accent-blue: #3498db;
+  --border-color: #e9ecef;
+  --shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 4px 24px rgba(0, 0, 0, 0.12);
+  --radius: 12px;
+  --radius-sm: 8px;
+}
+
+body {
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* 按钮样式 */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 24px;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  outline: none;
+}
+
+.btn:active {
+  transform: scale(0.96);
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, var(--accent-green), #27ae60);
+  color: white;
+  box-shadow: 0 4px 12px rgba(46, 204, 113, 0.3);
+}
+
+.btn-primary:hover {
+  box-shadow: 0 6px 16px rgba(46, 204, 113, 0.4);
+}
+
+.btn-secondary {
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+}
+
+.btn-danger {
+  background: linear-gradient(135deg, var(--accent-red), #c0392b);
+  color: white;
+}
+
+.btn-gold {
+  background: linear-gradient(135deg, var(--accent-gold), #e67e22);
+  color: white;
+  box-shadow: 0 4px 12px rgba(243, 156, 18, 0.3);
+}
+
+.btn-blue {
+  background: linear-gradient(135deg, var(--accent-blue), #2980b9);
+  color: white;
+}
+
+/* 卡牌样式 */
+.card {
+  width: 60px;
+  height: 84px;
+  border-radius: 8px;
+  background: white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  position: relative;
+  transition: transform 0.3s ease;
+}
+
+.card:hover {
+  transform: translateY(-4px);
+}
+
+.card.red {
+  color: var(--accent-red);
+}
+
+.card.black {
+  color: #1a1a2e;
+}
+
+.card .rank {
+  font-size: 20px;
+  line-height: 1;
+}
+
+.card .suit {
+  font-size: 24px;
+  line-height: 1;
+  margin-top: 2px;
+}
+
+.card .card-corner {
+  position: absolute;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.card .card-corner.top-left {
+  top: 4px;
+  left: 6px;
+}
+
+.card .card-corner.bottom-right {
+  bottom: 4px;
+  right: 6px;
+  transform: rotate(180deg);
+}
+
+.card.hidden {
+  background: linear-gradient(135deg, #2c3e50, #34495e);
+  border: 2px solid #3498db;
+}
+
+.card.hidden::after {
+  content: '🎩';
+  font-size: 28px;
+}
+
+/* 动画 */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+
+@keyframes dealCard {
+  from { opacity: 0; transform: translateY(-50px) rotate(-10deg); }
+  to { opacity: 1; transform: translateY(0) rotate(0); }
+}
+
+.fade-in {
+  animation: fadeIn 0.3s ease forwards;
+}
+
+.slide-up {
+  animation: slideUp 0.4s ease forwards;
+}
+
+.pulse {
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.deal-card {
+  animation: dealCard 0.4s ease forwards;
+}
