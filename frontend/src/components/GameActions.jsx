@@ -35,34 +35,35 @@ const GameActions = ({ gameState, playerId }) => {
     );
   }
 
-  // 在非finished状态下，如果没有玩家或不是我的回合，显示等待
-  if (!player || (!isMyTurn && gameState?.state !== 'betting')) {
+  // playing状态且是我的回合时显示操作按钮
+  if (gameState?.state === 'playing' && isMyTurn) {
     return (
       <View style={styles.container}>
-        <Text style={styles.waiting}>等待中...</Text>
+        <View style={styles.row}>
+          <TouchableOpacity style={styles.hitBtn} onPress={hit}>
+            <Text style={styles.btnText}>要牌</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.standBtn} onPress={stand}>
+            <Text style={styles.btnText}>停牌</Text>
+          </TouchableOpacity>
+
+          {canDouble && (
+            <TouchableOpacity style={styles.doubleBtn} onPress={doubleDown}>
+              <Text style={styles.btnText}>加倍</Text>
+            </TouchableOpacity>
+          )}
+        </View>
+
+        <Text style={styles.hint}>点数: {calcHand(player.cards)}</Text>
       </View>
     );
   }
 
+  // 其他情况显示等待（dealer回合，或playing中等待AI）
   return (
     <View style={styles.container}>
-      <View style={styles.row}>
-        <TouchableOpacity style={styles.hitBtn} onPress={hit}>
-          <Text style={styles.btnText}>要牌</Text>
-        </TouchableOpacity>
-        
-        <TouchableOpacity style={styles.standBtn} onPress={stand}>
-          <Text style={styles.btnText}>停牌</Text>
-        </TouchableOpacity>
-        
-        {canDouble && (
-          <TouchableOpacity style={styles.doubleBtn} onPress={doubleDown}>
-            <Text style={styles.btnText}>加倍</Text>
-          </TouchableOpacity>
-        )}
-      </View>
-      
-      <Text style={styles.hint}>点数: {calcHand(player.cards)}</Text>
+      <Text style={styles.waiting}>等待中...</Text>
     </View>
   );
 };
