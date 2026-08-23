@@ -9,6 +9,12 @@ const { Server } = require('socket.io');
 const cors = require('cors');
 const path = require('path');
 const { initSocket } = require('./socket/gameSocket');
+const { socketAuthMiddleware } = require('./middleware/auth');
+const authRoutes = require('./routes/auth');
+const userRoutes = require('./routes/user');
+
+// 初始化数据库
+require('./database/db');
 
 const app = express();
 const server = http.createServer(app);
@@ -17,7 +23,7 @@ const PORT = process.env.PORT || 60215;
 // CORS配置
 app.use(cors({
   origin: '*',
-  methods: ['GET', 'POST']
+  methods: ['GET', 'POST', 'PUT', 'DELETE']
 }));
 
 app.use(express.json());
@@ -38,6 +44,10 @@ app.get('/api/status', (req, res) => {
   });
 });
 
+// 认证和用户路由
+app.use('/api/auth', authRoutes);
+app.use('/api/users', userRoutes);
+
 // 静态文件服务（前端构建产物）
 app.use(express.static(path.join(__dirname, '../../frontend/dist')));
 
@@ -55,6 +65,9 @@ const io = new Server(server, {
   pingTimeout: 60000,
   pingInterval: 25000
 });
+
+// Socket.IO认证中间件
+io.use(socketAuthMiddleware);
 
 // 初始化Socket
 initSocket(io);

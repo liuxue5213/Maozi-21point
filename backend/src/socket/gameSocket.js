@@ -5,6 +5,7 @@
 
 const { GameEngine, GameState } = require('../game/GameEngine');
 const { AIPlayer } = require('../game/AIPlayer');
+const User = require('../models/User');
 
 // 存储所有活跃游戏
 const games = new Map();
@@ -12,56 +13,123 @@ const games = new Map();
 const matchQueue = [];
 // 玩家映射：socketId -> gameId
 const playerGameMap = new Map();
+// 玩家筹码映射：socketId -> 实际筹码
+const playerChipsMap = new Map();
 // AI计时器
 const aiTimers = new Map();
 
 function initSocket(io) {
-  io.on('connection', (socket) => {
-    console.log(`玩家连接: ${socket.id}`);
-    
+  io.on('connection', async (socket) => {
+    const userId = socket.userId;
+    console.log(`玩家连接: ${socket.id}, 用户ID: ${userId}`);
+
+    // 从数据库加载用户信息
+    try {
+      const user = await User.findById(userId);
+      if (user) {
+        socket.playerName = user.username;
+        socket.playerId = userId;
+        socket.userChips = user.chips;
+        playerChipsMap.set(socket.id, user.chips);
+        console.log(`✅ 用户加载成功: ${user.username}, 筹码: ${user.chips}`);
+      } else {
+        console.error('❌ 用户不存在:', userId);
+        socket.disconnect();
+        return;
+      }
+    } catch (error) {
+      console.error('❌ 加载用户失败:', error);
+      socket.disconnect();
+      return;
+    }
+
     // 发送在线人数
     const onlineCount = io.engine.clientsCount;
     socket.emit('onlineCount', { count: onlineCount, matching: matchQueue.length });
+    socket.emit('playerSet', { id: socket.id, name: socket.playerName, chips: socket.userChips });
     io.emit('onlineCount', { count: onlineCount, matching: matchQueue.length });
 
-    // 玩家信息设置
+    // 玩家信息设置（兼容旧版）
     socket.on('setPlayer', (data) => {
+      if (socket.playerName) return; // 已通过认证加载
       socket.playerName = data.name || '玩家' + socket.id.slice(0, 4);
       socket.playerId = socket.id;
       socket.emit('playerSet', { id: socket.id, name: socket.playerName });
     });
 
     // 人机对战 - 创建游戏
-    socket.on('startPvE', () => {
+    socket.on('startPvE', async () => {
       const gameId = `pve_${socket.id}`;
-      const game = new GameEngine(gameId, 'pve');
-      
+
+      // 游戏结束回调 - 保存积分到数据库
+      const onGameEnd = async (results, duration) => {
+        for (const r of results) {
+          if (r.playerId === socket.id) {
+            try {
+              // 更新用户筹码
+              const player = game.players.get(socket.id);
+              if (player) {
+                await User.setChips(socket.userId, player.chips);
+                playerChipsMap.set(socket.id, player.chips);
+                socket.userChips = player.chips;
+                console.log(`💰 游戏结束保存积分: ${socket.playerName} -> ${player.chips}`);
+              }
+
+              // 更新游戏统计
+              await User.updateGameStats(socket.userId, r.result, r.chipsChange);
+
+              // 添加游戏历史
+              await User.addGameHistory(socket.userId, {
+                gameMode: 'pve',
+                result: r.result,
+                chipsChange: r.chipsChange,
+                opponentName: 'AI',
+                duration: duration
+              });
+
+              // 发送更新后的用户信息给客户端
+              socket.emit('userInfo', {
+                chips: socket.userChips,
+                level: (await User.findById(socket.userId))?.level || 1
+              });
+            } catch (error) {
+              console.error('❌ 保存游戏结果失败:', error);
+            }
+          }
+        }
+      };
+
+      const game = new GameEngine(gameId, 'pve', onGameEnd);
+
+      // 使用用户实际筹码
+      const userChips = socket.userChips || 1000;
+
       // 添加玩家
-      game.addPlayer(socket.id, socket.playerName, 1000);
-      
+      game.addPlayer(socket.id, socket.playerName, userChips);
+
       // 添加AI (在PvE中确保人类玩家先行动)
       const ai = new AIPlayer('medium');
-      game.addPlayer('ai_1', ai.name, 1000, true); // AI总是第二个行动
-      
+      game.addPlayer('ai_1', ai.name, userChips, true); // AI总是第二个行动
+
       games.set(gameId, game);
       playerGameMap.set(socket.id, gameId);
-      
+
       // 开始游戏
       game.startRound();
-      
+
       // 自动给AI下注
-      const aiBet = ai.placeBet(1000, game.minBet);
+      const aiBet = ai.placeBet(userChips, game.minBet);
       game.placeBet('ai_1', aiBet);
-      
+
       socket.emit('gameCreated', { gameId, mode: 'pve' });
       socket.emit('gameState', game.getState(socket.id));
-      
+
       // 包装executeAITurn以在AI操作后广播状态
       const originalExecuteAITurn = game.executeAITurn.bind(game);
       game.executeAITurn = (aiPlayer) => {
         console.log('🤖 gameSocket包装AI操作:', aiPlayer.id);
         originalExecuteAITurn(aiPlayer);
-        
+
         // AI操作完成后广播状态（2.2秒后：1秒思考 + 1秒操作 + 0.2秒缓冲）
         setTimeout(() => {
           console.log('🤖 广播AI操作后的游戏状态');
@@ -195,15 +263,26 @@ function initSocket(io) {
     });
 
     // 断开连接
-    socket.on('disconnect', () => {
+    socket.on('disconnect', async () => {
       console.log(`玩家断开: ${socket.id}`);
-      
+
+      // 保存用户积分到数据库
+      try {
+        const currentChips = playerChipsMap.get(socket.id);
+        if (currentChips !== undefined && socket.playerId) {
+          await User.setChips(socket.playerId, currentChips);
+          console.log(`💰 保存用户积分: ${socket.playerName} -> ${currentChips}`);
+        }
+      } catch (error) {
+        console.error('❌ 保存积分失败:', error);
+      }
+
       // 从匹配队列移除
       const index = matchQueue.findIndex(p => p.id === socket.id);
       if (index !== -1) {
         matchQueue.splice(index, 1);
       }
-      
+
       // 通知对手
       const gameId = playerGameMap.get(socket.id);
       if (gameId) {
@@ -219,7 +298,10 @@ function initSocket(io) {
         }
         playerGameMap.delete(socket.id);
       }
-      
+
+      // 清除玩家筹码映射
+      playerChipsMap.delete(socket.id);
+
       // 清除AI计时器
       aiTimers.forEach((timer, key) => {
         if (key.includes(socket.id)) {

@@ -53,7 +53,7 @@ const GameState = {
 };
 
 class GameEngine {
-  constructor(gameId, mode = 'pve') {
+  constructor(gameId, mode = 'pve', onGameEnd = null) {
     this.gameId = gameId;
     this.mode = mode; // 'pve' 人机 | 'pvp' 匹配
     this.deck = new Deck(6);
@@ -64,6 +64,8 @@ class GameEngine {
     this.round = 0;
     this.minBet = 10;
     this.maxBet = 500;
+    this.onGameEnd = onGameEnd; // 游戏结束回调
+    this.startTime = Date.now();
   }
 
   addPlayer(playerId, playerName, chips = 1000, isAI = false) {
@@ -300,11 +302,14 @@ class GameEngine {
     const dealerBust = isBust(this.dealer.cards);
     const dealerBJ = isBlackjack(this.dealer.cards);
 
+    const results = [];
+
     for (const [id, player] of this.players) {
       if (player.result === 'lose') continue; // 已经爆牌
 
       const playerScore = calculateHand(player.cards);
       const playerBJ = player.blackjack;
+      const initialChips = player.chips;
 
       if (playerBJ && dealerBJ) {
         player.result = 'push';
@@ -328,6 +333,22 @@ class GameEngine {
         player.result = 'lose';
         player.winAmount = 0;
       }
+
+      // 记录结果用于回调
+      if (!player.isAI) {
+        results.push({
+          playerId: id,
+          result: player.result,
+          chipsChange: player.chips - initialChips,
+          winAmount: player.winAmount
+        });
+      }
+    }
+
+    // 触发游戏结束回调
+    if (this.onGameEnd) {
+      const duration = Math.floor((Date.now() - this.startTime) / 1000);
+      this.onGameEnd(results, duration);
     }
   }
 
