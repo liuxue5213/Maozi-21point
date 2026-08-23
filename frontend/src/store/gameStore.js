@@ -5,8 +5,8 @@
 import { create } from 'zustand';
 import { io } from 'socket.io-client';
 
-// 服务器地址 - 开发时使用本地，生产时使用服务器IP
-const SERVER_HOST = import.meta.env.VITE_SERVER_HOST || 'localhost';
+// 服务器地址 - 默认连接生产服务器
+const SERVER_HOST = import.meta.env.VITE_SERVER_HOST || '120.48.13.152';
 const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || `http://${SERVER_HOST}:60215`;
 
 const useGameStore = create((set, get) => ({
