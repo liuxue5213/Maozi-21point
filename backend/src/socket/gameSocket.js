@@ -38,7 +38,7 @@ function initSocket(io) {
       
       // 添加玩家
       game.addPlayer(socket.id, socket.playerName, 1000);
-
+      
       // 添加AI (在PvE中确保人类玩家先行动)
       const ai = new AIPlayer('medium');
       game.addPlayer('ai_1', ai.name, 1000, true); // AI总是第二个行动
@@ -55,6 +55,19 @@ function initSocket(io) {
       
       socket.emit('gameCreated', { gameId, mode: 'pve' });
       socket.emit('gameState', game.getState(socket.id));
+      
+      // 包装executeAITurn以在AI操作后广播状态
+      const originalExecuteAITurn = game.executeAITurn.bind(game);
+      game.executeAITurn = (aiPlayer) => {
+        console.log('🤖 gameSocket包装AI操作:', aiPlayer.id);
+        originalExecuteAITurn(aiPlayer);
+        
+        // AI操作完成后广播状态（2.2秒后：1秒思考 + 1秒操作 + 0.2秒缓冲）
+        setTimeout(() => {
+          console.log('🤖 广播AI操作后的游戏状态');
+          broadcastGameState(game, io);
+        }, 2200);
+      };
     });
 
     // 玩家1V1匹配

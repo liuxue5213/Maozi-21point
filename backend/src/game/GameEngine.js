@@ -222,7 +222,10 @@ class GameEngine {
 
       // 如果下一个玩家是AI，自动执行AI操作
       const nextPlayer = activePlayers[currentIndex + 1];
-      if (nextPlayer.id.startsWith('ai_')) {
+      if (nextPlayer.isAI || nextPlayer.id.startsWith('ai_')) {
+        console.log('🤖 检测到AI玩家，执行自动操作:', nextPlayer.id);
+        // 注意：这里需要传递广播回调，但这在GameEngine中不可用
+        // 实际广播由外部gameSocket处理
         this.executeAITurn(nextPlayer);
       }
     } else {
@@ -233,30 +236,47 @@ class GameEngine {
 
   // 执行AI回合操作
   executeAITurn(aiPlayer) {
+    console.log('🤖 执行AI回合:', aiPlayer.id, '卡片数:', aiPlayer.cards.length);
+
     // 延迟执行，模拟思考时间
     setTimeout(() => {
       const dealerVisibleCard = this.dealer.cards[0];
       const canDouble = aiPlayer.cards.length === 2 && aiPlayer.chips >= aiPlayer.bet;
+
+      console.log('🤖 AI决策输入:', {
+        cards: aiPlayer.cards,
+        dealerCard: dealerVisibleCard,
+        canDouble
+      });
 
       // 导入AI决策
       const { AIPlayer } = require('./AIPlayer');
       const ai = new AIPlayer('medium');
       const decision = ai.decide(aiPlayer.cards, dealerVisibleCard, canDouble);
 
+      console.log('🤖 AI决策结果:', decision);
+
       // 执行AI决策
+      let actionCompleted = false;
       switch (decision) {
         case 'hit':
-          this.hit(aiPlayer.id);
+          console.log('🤖 AI选择要牌');
+          actionCompleted = this.hit(aiPlayer.id);
           break;
         case 'stand':
-          this.stand(aiPlayer.id);
+          console.log('🤖 AI选择停牌');
+          actionCompleted = this.stand(aiPlayer.id);
           break;
         case 'double':
-          this.doubleDown(aiPlayer.id);
+          console.log('🤖 AI选择加倍');
+          actionCompleted = this.doubleDown(aiPlayer.id);
           break;
         default:
-          this.stand(aiPlayer.id);
+          console.log('🤖 AI默认停牌');
+          actionCompleted = this.stand(aiPlayer.id);
       }
+
+      console.log('🤖 AI操作完成:', actionCompleted);
     }, 1000); // 1秒思考时间
   }
 
