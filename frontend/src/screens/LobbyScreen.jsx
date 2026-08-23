@@ -136,12 +136,28 @@ const LobbyScreen = () => {
             <Text style={styles.quickNavIcon}>👥</Text>
             <Text style={styles.quickNavText}>好友</Text>
           </TouchableOpacity>
+        </View>
+
+        <View style={styles.quickNav}>
+          <TouchableOpacity style={styles.quickNavBtn} onPress={() => setScreen('chat')}>
+            <Text style={styles.quickNavIcon}>💬</Text>
+            <Text style={styles.quickNavText}>聊天</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.quickNavBtn} onPress={() => setScreen('shop')}>
+            <Text style={styles.quickNavIcon}>🛒</Text>
+            <Text style={styles.quickNavText}>商店</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.quickNavBtn} onPress={() => setScreen('tournament')}>
+            <Text style={styles.quickNavIcon}>🎯</Text>
+            <Text style={styles.quickNavText}>比赛</Text>
+          </TouchableOpacity>
           {isAdmin && (
             <TouchableOpacity style={styles.quickNavBtn} onPress={() => setScreen('admin')}>
               <Text style={styles.quickNavIcon}>🔧</Text>
-              <Text style={styles.quickNavText}>管理后台</Text>
+              <Text style={styles.quickNavText}>管理</Text>
             </TouchableOpacity>
           )}
+          {!isAdmin && <View style={styles.quickNavBtn} />}
         </View>
       </ScrollView>
     </View>

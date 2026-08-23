@@ -9,6 +9,7 @@ const { Server } = require('socket.io');
 const cors = require('cors');
 const path = require('path');
 const { initSocket } = require('./socket/gameSocket');
+const { initChatHandlers } = require('./socket/chatHandlers');
 const { socketAuthMiddleware } = require('./middleware/auth');
 const authRoutes = require('./routes/auth');
 const userRoutes = require('./routes/user');
@@ -81,6 +82,7 @@ io.use(socketAuthMiddleware);
 
 // 初始化Socket
 initSocket(io);
+initChatHandlers(io);
 
 // 启动服务
 server.listen(PORT, '0.0.0.0', () => {

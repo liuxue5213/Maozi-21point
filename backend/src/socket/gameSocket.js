@@ -1,6 +1,6 @@
 /**
  * 帽子21点 - Socket.IO 游戏通信
- * 处理实时游戏事件：匹配、下注、要牌、停牌等
+ * 处理实时游戏事件：匹配、下注、要牌、停牌、好友对战、观战等
  */
 
 const { GameEngine, GameState } = require('../game/GameEngine');
@@ -17,6 +17,10 @@ const playerGameMap = new Map();
 const playerChipsMap = new Map();
 // AI计时器
 const aiTimers = new Map();
+// 私人房间映射：roomId -> { gameId, hostId, guestId }
+const privateRooms = new Map();
+// 观战映射：gameId -> Set<socketId>
+const spectators = new Map();
 
 function initSocket(io) {
   io.on('connection', async (socket) => {
@@ -260,6 +264,99 @@ function initSocket(io) {
       }
       
       broadcastGameState(game, io);
+    });
+
+    // ========== 好友对战功能 ==========
+
+    // 创建私人房间
+    socket.on('createPrivateRoom', (data) => {
+      const roomId = `private_${socket.id}`;
+      const gameId = roomId;
+
+      // 创建游戏房间
+      const game = new GameEngine(gameId, 'private');
+      const userChips = socket.userChips || 1000;
+      game.addPlayer(socket.id, socket.playerName, userChips);
+
+      games.set(gameId, game);
+      playerGameMap.set(socket.id, gameId);
+      privateRooms.set(roomId, { gameId, hostId: socket.id, guestId: null });
+
+      socket.emit('privateRoomCreated', { roomId });
+      console.log(`🏠 私人房间创建: ${roomId}, 房主: ${socket.playerName}`);
+    });
+
+    // 加入私人房间
+    socket.on('joinPrivateRoom', (data) => {
+      const { roomId } = data;
+      const room = privateRooms.get(roomId);
+
+      if (!room) {
+        socket.emit('error', { message: '房间不存在' });
+        return;
+      }
+
+      if (room.guestId) {
+        socket.emit('error', { message: '房间已满' });
+        return;
+      }
+
+      const game = games.get(room.gameId);
+      if (!game) {
+        socket.emit('error', { message: '游戏不存在' });
+        return;
+      }
+
+      // 加入房间逻辑
+      const userChips = socket.userChips || 1000;
+      game.addPlayer(socket.id, socket.playerName, userChips);
+      room.guestId = socket.id;
+      playerGameMap.set(socket.id, room.gameId);
+
+      // 开始游戏
+      game.startRound();
+
+      // 通知房主和加入者
+      io.to(room.hostId).emit('gameCreated', { gameId: room.gameId, mode: 'private', opponentName: socket.playerName });
+      socket.emit('gameCreated', { gameId: room.gameId, mode: 'private', opponentName: game.players.get(room.hostId)?.name });
+
+      // 广播游戏状态
+      broadcastGameState(game, io);
+
+      console.log(`🏠 玩家加入私人房间: ${roomId}, 玩家: ${socket.playerName}`);
+    });
+
+    // 邀请好友
+    socket.on('inviteFriend', (data) => {
+      const { friendId } = data;
+      io.to(friendId).emit('gameInvite', {
+        from: socket.userId,
+        fromName: socket.playerName
+      });
+      console.log(`📨 邀请好友: ${socket.playerName} -> ${friendId}`);
+    });
+
+    // 观战
+    socket.on('spectate', (data) => {
+      const { gameId } = data;
+      const game = games.get(gameId);
+
+      if (!game) {
+        socket.emit('error', { message: '游戏不存在' });
+        return;
+      }
+
+      // 观战逻辑
+      if (!spectators.has(gameId)) {
+        spectators.set(gameId, new Set());
+      }
+      spectators.get(gameId).add(socket.id);
+
+      // 发送当前游戏状态给观战者
+      socket.emit('spectating', { gameId });
+      socket.emit('gameState', game.getState(null)); // null表示观战视角
+
+      console.log(`👁️ 玩家观战: ${socket.playerName}, 游戏: ${gameId}`);
     });
 
     // 断开连接
