@@ -30,12 +30,12 @@ const GameScreen = () => {
   // 监听结果变化，更新比分
   useEffect(() => {
     if (!gameState || gameState.state !== 'finished') return;
-    
+
     const me = gameState.players.find(p => p.id === playerId);
     if (!me || !me.result || me.result === lastResult) return;
-    
+
     setLastResult(me.result);
-    
+
     if (me.result === 'win' || me.result === 'blackjack') {
       setScore(prev => ({ ...prev, win: prev.win + 1 }));
     } else if (me.result === 'lose') {
@@ -43,7 +43,7 @@ const GameScreen = () => {
     } else if (me.result === 'push') {
       setScore(prev => ({ ...prev, draw: prev.draw + 1 }));
     }
-  }, [gameState?.state]);
+  }, [gameState, playerId, lastResult]);
 
   // 重置比分（新一轮游戏时）
   useEffect(() => {
@@ -164,6 +164,21 @@ const GameScreen = () => {
       <View style={styles.controls}>
         {isBetting && <BettingControls gameState={gameState} playerId={playerId} />}
         {(isPlaying || isFinished || isDealerTurn) && <GameActions gameState={gameState} playerId={playerId} />}
+
+        {/* 兜底显示：确保始终有操作按钮 */}
+        {!isBetting && !isPlaying && !isFinished && !isDealerTurn && (
+          <View style={styles.fallbackControls}>
+            <Text style={styles.fallbackText}>游戏状态: {gameState.state || '未知'}</Text>
+            <TouchableOpacity style={styles.fallbackBtn} onPress={backToLobby}>
+              <Text style={styles.fallbackBtnText}>返回大厅</Text>
+            </TouchableOpacity>
+          </View>
+        )}
+        {!isBetting && !isPlaying && !isFinished && !isDealerTurn && (
+          <View style={styles.debugInfo}>
+            <Text style={styles.debugText}>未知状态: {gameState.state}</Text>
+          </View>
+        )}
       </View>
     </View>
   );
@@ -325,6 +340,29 @@ const styles = StyleSheet.create({
   },
   controls: {
     flexShrink: 0,
+  },
+  fallbackControls: {
+    padding: 20,
+    backgroundColor: '#fff8e1',
+    alignItems: 'center',
+    gap: 12,
+    borderTopWidth: 1,
+    borderTopColor: '#e8e2d8',
+  },
+  fallbackText: {
+    fontSize: 14,
+    color: '#a89f94',
+  },
+  fallbackBtn: {
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    backgroundColor: '#7a7068',
+    borderRadius: 8,
+  },
+  fallbackBtnText: {
+    color: 'white',
+    fontSize: 15,
+    fontWeight: '600',
   },
 });
 
