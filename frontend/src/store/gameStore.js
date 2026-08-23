@@ -10,64 +10,109 @@ const SERVER_HOST = import.meta.env.VITE_SERVER_HOST || 'localhost';
 const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || `http://${SERVER_HOST}:60215`;
 
 const useGameStore = create((set, get) => ({
+  // 认证状态
+  token: localStorage.getItem('token') || null,
+  user: JSON.parse(localStorage.getItem('user') || 'null'),
+  isAuthenticated: !!localStorage.getItem('token'),
+
   // 玩家信息
   playerName: (() => {
     try {
-      return localStorage.getItem('playerName') || localStorage.getItem('playerName_backup') || '';
+      const user = JSON.parse(localStorage.getItem('user') || 'null');
+      return user?.username || localStorage.getItem('playerName') || localStorage.getItem('playerName_backup') || '';
     } catch (e) {
       return '';
     }
   })(),
   playerId: '',
-  
+
   // Socket连接
   socket: null,
   connected: false,
-  
+
   // 游戏状态
   gameId: null,
   gameMode: null, // 'pve' | 'pvp'
   gameState: null,
-  currentScreen: 'home', // 'home' | 'lobby' | 'game' | 'waiting'
-  
+  currentScreen: 'auth', // 'auth' | 'home' | 'lobby' | 'game' | 'waiting'
+
   // UI状态
   message: '',
   error: '',
   onlineCount: 0,
   matchingCount: 0,
-  
+
+  // 登录
+  login: (token, user) => {
+    localStorage.setItem('token', token);
+    localStorage.setItem('user', JSON.stringify(user));
+    set({
+      token,
+      user,
+      isAuthenticated: true,
+      playerName: user.username,
+      currentScreen: 'lobby'
+    });
+  },
+
+  // 登出
+  logout: () => {
+    const { socket } = get();
+    if (socket) {
+      socket.disconnect();
+    }
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    set({
+      token: null,
+      user: null,
+      isAuthenticated: false,
+      socket: null,
+      connected: false,
+      playerName: '',
+      playerId: '',
+      currentScreen: 'auth'
+    });
+  },
+
   // 设置玩家名
   setPlayerName: (name) => {
     try {
       localStorage.setItem('playerName', name);
-      localStorage.setItem('playerName_backup', name); // 备用存储
+      localStorage.setItem('playerName_backup', name);
     } catch (e) {
       console.warn('localStorage保存失败:', e);
     }
     set({ playerName: name });
   },
-  
-  // 连接Socket
+
+  // 连接Socket (带认证)
   connect: () => {
+    const { token } = get();
     console.log('正在连接Socket服务器:', SOCKET_URL);
+
     const socket = io(SOCKET_URL, {
       transports: ['websocket', 'polling'],
       reconnection: true,
       reconnectionAttempts: 5,
       reconnectionDelay: 1000,
       timeout: 10000,
+      auth: { token } // JWT认证
     });
 
     socket.on('connect', () => {
       console.log('Socket连接成功:', socket.id);
       set({ connected: true, socket });
-      const { playerName } = get();
-      socket.emit('setPlayer', { name: playerName || '玩家' + socket.id.slice(0, 4) });
     });
 
     socket.on('connect_error', (error) => {
       console.error('Socket连接错误:', error);
-      set({ error: '连接服务器失败，请检查网络' });
+      if (error.message.includes('认证')) {
+        // Token过期或无效，返回登录页
+        get().logout();
+      } else {
+        set({ error: '连接服务器失败，请检查网络' });
+      }
     });
 
     socket.on('disconnect', () => {
@@ -77,7 +122,18 @@ const useGameStore = create((set, get) => ({
 
     socket.on('playerSet', (data) => {
       console.log('玩家信息设置成功:', data);
-      set({ playerId: data.id, playerName: data.name });
+      set({
+        playerId: data.id,
+        playerName: data.name,
+        user: { ...get().user, chips: data.chips }
+      });
+    });
+
+    socket.on('userInfo', (data) => {
+      console.log('用户信息更新:', data);
+      set({
+        user: { ...get().user, ...data }
+      });
     });
 
     socket.on('gameCreated', (data) => {

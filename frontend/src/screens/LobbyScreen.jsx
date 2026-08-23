@@ -7,7 +7,7 @@ import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from '../rnw';
 import useGameStore from '../store/gameStore';
 
 const LobbyScreen = () => {
-  const { playerName, startPvE, startMatch, connected, onlineCount, error, clearError } = useGameStore();
+  const { playerName, user, startPvE, startMatch, connected, onlineCount, error, clearError, logout } = useGameStore();
 
   React.useEffect(() => {
     if (error) {
@@ -40,12 +40,15 @@ const LobbyScreen = () => {
           </View>
           <View>
             <Text style={styles.playerName}>{playerName}</Text>
-            <Text style={styles.playerChips}>💰 1000</Text>
+            <Text style={styles.playerChips}>💰 {user?.chips || 1000}</Text>
           </View>
         </View>
         <View style={styles.statusArea}>
           <View style={[styles.statusDot, { backgroundColor: connected ? '#6b9b6a' : '#c9605a' }]} />
           <Text style={styles.statusText}>{connected ? `${onlineCount}人在线` : '连接中...'}</Text>
+          <TouchableOpacity style={styles.logoutBtn} onPress={logout}>
+            <Text style={styles.logoutBtnText}>登出</Text>
+          </TouchableOpacity>
         </View>
       </View>
 
@@ -156,6 +159,17 @@ const styles = StyleSheet.create({
   statusText: {
     fontSize: 11,
     color: '#b8b3ad',
+  },
+  logoutBtn: {
+    paddingVertical: 4,
+    paddingHorizontal: 8,
+    backgroundColor: '#f0ece6',
+    borderRadius: 4,
+    marginTop: 4,
+  },
+  logoutBtnText: {
+    fontSize: 10,
+    color: '#8a8580',
   },
   errorBar: {
     backgroundColor: '#fee',
