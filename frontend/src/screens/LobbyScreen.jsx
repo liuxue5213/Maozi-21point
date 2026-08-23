@@ -8,7 +8,6 @@ import useGameStore from '../store/gameStore';
 
 const LobbyScreen = () => {
   const { playerName, user, startPvE, startMatch, connected, onlineCount, error, clearError, logout, setScreen } = useGameStore();
-  const [showMore, setShowMore] = React.useState(false);
 
   const isAdmin = user?.role === 'admin' || user?.isAdmin === true;
 
@@ -119,7 +118,7 @@ const LobbyScreen = () => {
           </View>
         </View>
 
-        {/* 快捷导航 - 标准移动APP风格：核心功能 + 更多菜单 */}
+        {/* 快捷导航 - 单行4个按钮 */}
         <View style={styles.quickNav}>
           <TouchableOpacity style={styles.quickNavBtn} onPress={() => setScreen('leaderboard')}>
             <Text style={styles.quickNavIcon}>🏆</Text>
@@ -133,39 +132,11 @@ const LobbyScreen = () => {
             <Text style={styles.quickNavIcon}>📅</Text>
             <Text style={styles.quickNavText}>签到</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.quickNavBtn} onPress={() => setShowMore(!showMore)}>
+          <TouchableOpacity style={styles.quickNavBtn} onPress={() => setScreen('more')}>
             <Text style={styles.quickNavIcon}>⋯</Text>
             <Text style={styles.quickNavText}>更多</Text>
           </TouchableOpacity>
         </View>
-
-        {/* 更多功能菜单 */}
-        {showMore && (
-          <View style={styles.moreMenu}>
-            <TouchableOpacity style={styles.moreItem} onPress={() => { setScreen('friends'); setShowMore(false); }}>
-              <Text style={styles.moreIcon}>👥</Text>
-              <Text style={styles.moreText}>好友</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.moreItem} onPress={() => { setScreen('chat'); setShowMore(false); }}>
-              <Text style={styles.moreIcon}>💬</Text>
-              <Text style={styles.moreText}>聊天</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.moreItem} onPress={() => { setScreen('shop'); setShowMore(false); }}>
-              <Text style={styles.moreIcon}>🛒</Text>
-              <Text style={styles.moreText}>商店</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.moreItem} onPress={() => { setScreen('tournament'); setShowMore(false); }}>
-              <Text style={styles.moreIcon}>🎯</Text>
-              <Text style={styles.moreText}>比赛</Text>
-            </TouchableOpacity>
-            {isAdmin && (
-              <TouchableOpacity style={styles.moreItem} onPress={() => { setScreen('admin'); setShowMore(false); }}>
-                <Text style={styles.moreIcon}>🔧</Text>
-                <Text style={styles.moreText}>管理</Text>
-              </TouchableOpacity>
-            )}
-          </View>
-        )}
       </ScrollView>
     </View>
   );
@@ -386,35 +357,6 @@ const styles = StyleSheet.create({
     color: '#7a7068',
     fontWeight: '500',
   },
-  moreMenu: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 10,
-    marginTop: 10,
-    padding: 12,
-    backgroundColor: 'white',
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: '#ebe7e2',
-  },
-  moreItem: {
-    width: '18%',
-    alignItems: 'center',
-    gap: 4,
-    paddingVertical: 8,
-  },
-  moreIcon: {
-    fontSize: 16,
-  },
-  moreText: {
-    fontSize: 10,
-    color: '#7a7068',
-  },
-  quickNavRow: { display: 'none' },
-  quickNavBtnSmall: { display: 'none' },
-  quickNavIconSmall: { display: 'none' },
-  quickNavLabels: { display: 'none' },
-  quickNavLabel: { display: 'none' },
   leaderboardBtn: {
     marginTop: 16,
     paddingVertical: 14,
