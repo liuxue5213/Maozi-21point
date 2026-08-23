@@ -170,7 +170,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   avatarText: {
-    fontSize: 18,
+    fontSize: 14,
     color: '#8a8580',
   },
   playerName: {
@@ -308,22 +308,21 @@ const styles = StyleSheet.create({
   },
   quickNav: {
     flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 10,
+    gap: 8,
     marginTop: 16,
   },
   quickNavBtn: {
-    width: '48%',
-    paddingVertical: 12,
+    flex: 1,
+    paddingVertical: 10,
     backgroundColor: 'white',
     borderRadius: 8,
     borderWidth: 1,
     borderColor: '#ebe7e2',
     alignItems: 'center',
-    gap: 4,
+    gap: 2,
   },
   quickNavIcon: {
-    fontSize: 18,
+    fontSize: 14,
   },
   quickNavText: {
     fontSize: 12,

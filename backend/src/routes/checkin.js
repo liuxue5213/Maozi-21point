@@ -15,8 +15,8 @@ const CHECKIN_TABLE_SQL = `
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     user_id TEXT NOT NULL,
     checkin_date DATE NOT NULL,
-    chips_reward INTEGER NOT NULL,
-    streak_day INTEGER DEFAULT 1,
+    reward INTEGER NOT NULL,
+    streak INTEGER DEFAULT 1,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id),
     UNIQUE(user_id, checkin_date)
@@ -64,7 +64,7 @@ router.post('/', async (req, res) => {
 
     let streakDay = 1;
     if (lastCheckin) {
-      streakDay = lastCheckin.streak_day + 1;
+      streakDay = lastCheckin.streak + 1;
     }
 
     // 计算奖励：基础50-200随机筹码，连续7天额外奖励
@@ -85,7 +85,7 @@ router.post('/', async (req, res) => {
 
     // 记录签到
     await dbAsync.run(
-      'INSERT INTO checkins (user_id, checkin_date, chips_reward, streak_day) VALUES (?, ?, ?, ?)',
+      'INSERT INTO checkins (user_id, checkin_date, reward, streak) VALUES (?, ?, ?, ?)',
       [req.userId, today, totalReward, streakDay]
     );
 
@@ -134,7 +134,7 @@ router.get('/status', async (req, res) => {
     // 计算当前连续签到天数
     let currentStreak = 0;
     if (todayCheckin) {
-      currentStreak = todayCheckin.streak_day;
+      currentStreak = todayCheckin.streak;
     } else {
       // 检查昨天是否签到，确定当前连续天数
       const yesterday = new Date(now);
@@ -147,13 +147,13 @@ router.get('/status', async (req, res) => {
       );
 
       if (yesterdayCheckin) {
-        currentStreak = yesterdayCheckin.streak_day;
+        currentStreak = yesterdayCheckin.streak;
       }
     }
 
     // 获取最近7天签到记录
     const recentCheckins = await dbAsync.all(
-      `SELECT checkin_date, chips_reward, streak_day
+      `SELECT checkin_date, reward, streak
        FROM checkins
        WHERE user_id = ? AND checkin_date > date('now', '-7 days')
        ORDER BY checkin_date DESC`,
@@ -164,8 +164,8 @@ router.get('/status', async (req, res) => {
     const monthlyStats = await dbAsync.get(
       `SELECT
          COUNT(*) as totalDays,
-         SUM(chips_reward) as totalChips,
-         MAX(streak_day) as maxStreak
+         SUM(reward) as totalChips,
+         MAX(streak) as maxStreak
        FROM checkins
        WHERE user_id = ? AND strftime('%Y-%m', checkin_date) = strftime('%Y-%m', 'now')`,
       [req.userId]
@@ -183,8 +183,8 @@ router.get('/status', async (req, res) => {
         nextCheckin: todayCheckin ? getNextCheckinTime(now) : '现在可以签到',
         recentCheckins: recentCheckins.map(c => ({
           date: c.checkin_date,
-          reward: c.chips_reward,
-          streakDay: c.streak_day
+          reward: c.reward,
+          streakDay: c.streak
         })),
         monthlyStats: {
           totalDays: monthlyStats.totalDays || 0,
@@ -205,7 +205,7 @@ router.get('/calendar', async (req, res) => {
     await ensureCheckinTable();
 
     const calendar = await dbAsync.all(
-      `SELECT checkin_date, chips_reward, streak_day
+      `SELECT checkin_date, reward, streak
        FROM checkins
        WHERE user_id = ? AND strftime('%Y-%m', checkin_date) = strftime('%Y-%m', 'now')
        ORDER BY checkin_date ASC`,
@@ -215,8 +215,8 @@ router.get('/calendar', async (req, res) => {
     res.json({
       calendar: calendar.map(c => ({
         date: c.checkin_date,
-        reward: c.chips_reward,
-        streakDay: c.streak_day
+        reward: c.reward,
+        streakDay: c.streak
       }))
     });
   } catch (error) {
