@@ -8,6 +8,7 @@ import useGameStore from '../store/gameStore';
 
 const LobbyScreen = () => {
   const { playerName, user, startPvE, startMatch, connected, onlineCount, error, clearError, logout, setScreen } = useGameStore();
+  const [showMore, setShowMore] = React.useState(false);
 
   const isAdmin = user?.role === 'admin' || user?.isAdmin === true;
 
@@ -118,43 +119,53 @@ const LobbyScreen = () => {
           </View>
         </View>
 
-        {/* 快捷导航 - 单行 */}
-        <View style={styles.quickNavRow}>
-          <TouchableOpacity style={styles.quickNavBtnSmall} onPress={() => setScreen('checkin')}>
-            <Text style={styles.quickNavIconSmall}>📅</Text>
+        {/* 快捷导航 - 标准移动APP风格：核心功能 + 更多菜单 */}
+        <View style={styles.quickNav}>
+          <TouchableOpacity style={styles.quickNavBtn} onPress={() => setScreen('leaderboard')}>
+            <Text style={styles.quickNavIcon}>🏆</Text>
+            <Text style={styles.quickNavText}>排行榜</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.quickNavBtnSmall} onPress={() => setScreen('leaderboard')}>
-            <Text style={styles.quickNavIconSmall}>🏆</Text>
+          <TouchableOpacity style={styles.quickNavBtn} onPress={() => setScreen('profile')}>
+            <Text style={styles.quickNavIcon}>👤</Text>
+            <Text style={styles.quickNavText}>个人</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.quickNavBtnSmall} onPress={() => setScreen('profile')}>
-            <Text style={styles.quickNavIconSmall}>👤</Text>
+          <TouchableOpacity style={styles.quickNavBtn} onPress={() => setScreen('checkin')}>
+            <Text style={styles.quickNavIcon}>📅</Text>
+            <Text style={styles.quickNavText}>签到</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.quickNavBtnSmall} onPress={() => setScreen('friends')}>
-            <Text style={styles.quickNavIconSmall}>👥</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.quickNavBtnSmall} onPress={() => setScreen('chat')}>
-            <Text style={styles.quickNavIconSmall}>💬</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.quickNavBtnSmall} onPress={() => setScreen('shop')}>
-            <Text style={styles.quickNavIconSmall}>🛒</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.quickNavBtnSmall} onPress={() => setScreen('tournament')}>
-            <Text style={styles.quickNavIconSmall}>🎯</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.quickNavBtnSmall} onPress={() => setScreen('admin')}>
-            <Text style={styles.quickNavIconSmall}>🔧</Text>
+          <TouchableOpacity style={styles.quickNavBtn} onPress={() => setShowMore(!showMore)}>
+            <Text style={styles.quickNavIcon}>⋯</Text>
+            <Text style={styles.quickNavText}>更多</Text>
           </TouchableOpacity>
         </View>
-        <View style={styles.quickNavLabels}>
-          <Text style={styles.quickNavLabel}>签到</Text>
-          <Text style={styles.quickNavLabel}>排行</Text>
-          <Text style={styles.quickNavLabel}>个人</Text>
-          <Text style={styles.quickNavLabel}>好友</Text>
-          <Text style={styles.quickNavLabel}>聊天</Text>
-          <Text style={styles.quickNavLabel}>商店</Text>
-          <Text style={styles.quickNavLabel}>比赛</Text>
-          <Text style={styles.quickNavLabel}>管理</Text>
-        </View>
+
+        {/* 更多功能菜单 */}
+        {showMore && (
+          <View style={styles.moreMenu}>
+            <TouchableOpacity style={styles.moreItem} onPress={() => { setScreen('friends'); setShowMore(false); }}>
+              <Text style={styles.moreIcon}>👥</Text>
+              <Text style={styles.moreText}>好友</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.moreItem} onPress={() => { setScreen('chat'); setShowMore(false); }}>
+              <Text style={styles.moreIcon}>💬</Text>
+              <Text style={styles.moreText}>聊天</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.moreItem} onPress={() => { setScreen('shop'); setShowMore(false); }}>
+              <Text style={styles.moreIcon}>🛒</Text>
+              <Text style={styles.moreText}>商店</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.moreItem} onPress={() => { setScreen('tournament'); setShowMore(false); }}>
+              <Text style={styles.moreIcon}>🎯</Text>
+              <Text style={styles.moreText}>比赛</Text>
+            </TouchableOpacity>
+            {isAdmin && (
+              <TouchableOpacity style={styles.moreItem} onPress={() => { setScreen('admin'); setShowMore(false); }}>
+                <Text style={styles.moreIcon}>🔧</Text>
+                <Text style={styles.moreText}>管理</Text>
+              </TouchableOpacity>
+            )}
+          </View>
+        )}
       </ScrollView>
     </View>
   );
@@ -351,58 +362,59 @@ const styles = StyleSheet.create({
     color: '#8a8580',
     lineHeight: 1.8,
   },
-  quickNavRow: {
-    flexDirection: 'row',
-    gap: 6,
-    marginTop: 16,
-  },
-  quickNavBtnSmall: {
-    flex: 1,
-    paddingVertical: 8,
-    backgroundColor: 'white',
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: '#ebe7e2',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  quickNavIconSmall: {
-    fontSize: 16,
-  },
-  quickNavLabels: {
-    flexDirection: 'row',
-    gap: 6,
-    marginTop: 4,
-  },
-  quickNavLabel: {
-    flex: 1,
-    fontSize: 9,
-    color: '#8a8580',
-    textAlign: 'center',
-  },
   quickNav: {
     flexDirection: 'row',
-    gap: 8,
-    marginTop: 16,
+    gap: 10,
+    marginTop: 12,
   },
   quickNavBtn: {
     flex: 1,
-    paddingVertical: 10,
+    paddingVertical: 12,
     backgroundColor: 'white',
-    borderRadius: 8,
+    borderRadius: 10,
     borderWidth: 1,
     borderColor: '#ebe7e2',
     alignItems: 'center',
-    gap: 2,
+    gap: 4,
+    minHeight: 60,
   },
   quickNavIcon: {
-    fontSize: 14,
+    fontSize: 18,
   },
   quickNavText: {
-    fontSize: 12,
+    fontSize: 11,
     color: '#7a7068',
     fontWeight: '500',
   },
+  moreMenu: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 10,
+    marginTop: 10,
+    padding: 12,
+    backgroundColor: 'white',
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: '#ebe7e2',
+  },
+  moreItem: {
+    width: '18%',
+    alignItems: 'center',
+    gap: 4,
+    paddingVertical: 8,
+  },
+  moreIcon: {
+    fontSize: 16,
+  },
+  moreText: {
+    fontSize: 10,
+    color: '#7a7068',
+  },
+  quickNavRow: { display: 'none' },
+  quickNavBtnSmall: { display: 'none' },
+  quickNavIconSmall: { display: 'none' },
+  quickNavLabels: { display: 'none' },
+  quickNavLabel: { display: 'none' },
   leaderboardBtn: {
     marginTop: 16,
     paddingVertical: 14,
