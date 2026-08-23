@@ -10,16 +10,7 @@
 const express = require('express');
 const router = express.Router();
 const { User, ITEM_TYPES } = require('../models/User');
-
-// 中间件：验证用户登录
-const authMiddleware = (req, res, next) => {
-  const userId = req.headers['x-user-id'] || req.query.userId;
-  if (!userId) {
-    return res.status(401).json({ success: false, message: '请先登录' });
-  }
-  req.userId = userId;
-  next();
-};
+const { authMiddleware } = require('../middleware/auth');
 
 /**
  * GET /api/shop/items

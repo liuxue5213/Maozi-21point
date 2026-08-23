@@ -29,15 +29,14 @@ const ShopScreen = ({ onBack }) => {
     setLoading(true);
     setError('');
     try {
-      const endpoint = activeTab === 'items' ? '/api/shop/items' : '/api/shop/chips';
-      const response = await fetch(endpoint, {
+      const response = await fetch('/api/shop/items', {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const data = await response.json();
       if (response.ok) {
         setShopItems(data.items || []);
       } else {
-        setError(data.error || '获取商品列表失败');
+        setError(data.error || data.message || '获取商品列表失败');
       }
     } catch (err) {
       console.error('获取商品列表失败:', err);
@@ -49,40 +48,36 @@ const ShopScreen = ({ onBack }) => {
 
   const fetchUserItems = async () => {
     try {
-      const response = await fetch('/api/shop/user-items', {
+      const response = await fetch('/api/shop/inventory', {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const data = await response.json();
       if (response.ok) {
-        setUserItems(data.items || []);
+        setUserItems(data.items || data.inventory || []);
       }
     } catch (err) {
       console.error('获取用户道具失败:', err);
     }
   };
 
-  const handlePurchase = async (itemId) => {
+  const handlePurchase = async (itemType) => {
     setPurchasing(true);
     setError('');
     try {
-      const response = await fetch('/api/shop/purchase', {
+      const response = await fetch('/api/shop/buy', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({
-          itemId,
-          type: activeTab === 'items' ? 'item' : 'chips'
-        })
+        body: JSON.stringify({ itemType })
       });
       const data = await response.json();
       if (response.ok) {
-        // 刷新用户道具和商店
         await fetchUserItems();
         await fetchShopItems();
       } else {
-        setError(data.error || '购买失败');
+        setError(data.error || data.message || '购买失败');
       }
     } catch (err) {
       console.error('购买失败:', err);

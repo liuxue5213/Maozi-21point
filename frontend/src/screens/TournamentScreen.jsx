@@ -49,7 +49,7 @@ const TournamentScreen = ({ onBack }) => {
     setLoading(true);
     setError('');
     try {
-      const response = await fetch('/api/tournaments', {
+      const response = await fetch('/api/tournament/list', {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const data = await response.json();
@@ -79,24 +79,25 @@ const TournamentScreen = ({ onBack }) => {
   };
 
   const fetchLeaderboard = async () => {
-    try {
-      const response = await fetch('/api/tournaments/leaderboard?limit=20', {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
-      const data = await response.json();
-      if (response.ok) {
-        setLeaderboard(data.leaderboard || []);
-      }
-    } catch (err) {
-      console.error('获取排行榜失败:', err);
-    }
+    // 比赛排行榜暂不使用
+    // try {
+    //   const response = await fetch('/api/tournament/leaderboard?limit=20', {
+    //     headers: { 'Authorization': `Bearer ${token}` }
+    //   });
+    //   const data = await response.json();
+    //   if (response.ok) {
+    //     setLeaderboard(data.leaderboard || []);
+    //   }
+    // } catch (err) {
+    //   console.error('获取排行榜失败:', err);
+    // }
   };
 
   const handleJoin = async (tournamentId) => {
     setJoining(true);
     setError('');
     try {
-      const response = await fetch('/api/tournaments/join', {
+      const response = await fetch('/api/tournament/join', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
