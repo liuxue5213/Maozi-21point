@@ -5,13 +5,19 @@
 import { create } from 'zustand';
 import { io } from 'socket.io-client';
 
-// 服务器地址 - App运行时使用服务器IP，开发时使用本地
-const SERVER_HOST = import.meta.env.VITE_SERVER_HOST || '120.48.13.152';
+// 服务器地址 - 开发时使用本地，生产时使用服务器IP
+const SERVER_HOST = import.meta.env.VITE_SERVER_HOST || 'localhost';
 const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || `http://${SERVER_HOST}:60215`;
 
 const useGameStore = create((set, get) => ({
   // 玩家信息
-  playerName: localStorage.getItem('playerName') || '',
+  playerName: (() => {
+    try {
+      return localStorage.getItem('playerName') || localStorage.getItem('playerName_backup') || '';
+    } catch (e) {
+      return '';
+    }
+  })(),
   playerId: '',
   
   // Socket连接
@@ -32,57 +38,73 @@ const useGameStore = create((set, get) => ({
   
   // 设置玩家名
   setPlayerName: (name) => {
-    localStorage.setItem('playerName', name);
+    try {
+      localStorage.setItem('playerName', name);
+      localStorage.setItem('playerName_backup', name); // 备用存储
+    } catch (e) {
+      console.warn('localStorage保存失败:', e);
+    }
     set({ playerName: name });
   },
   
   // 连接Socket
   connect: () => {
+    console.log('正在连接Socket服务器:', SOCKET_URL);
     const socket = io(SOCKET_URL, {
       transports: ['websocket', 'polling'],
       reconnection: true,
       reconnectionAttempts: 5,
       reconnectionDelay: 1000,
+      timeout: 10000,
     });
-    
+
     socket.on('connect', () => {
+      console.log('Socket连接成功:', socket.id);
       set({ connected: true, socket });
       const { playerName } = get();
       socket.emit('setPlayer', { name: playerName || '玩家' + socket.id.slice(0, 4) });
     });
-    
+
+    socket.on('connect_error', (error) => {
+      console.error('Socket连接错误:', error);
+      set({ error: '连接服务器失败，请检查网络' });
+    });
+
     socket.on('disconnect', () => {
+      console.log('Socket断开连接');
       set({ connected: false });
     });
-    
+
     socket.on('playerSet', (data) => {
+      console.log('玩家信息设置成功:', data);
       set({ playerId: data.id, playerName: data.name });
     });
-    
+
     socket.on('gameCreated', (data) => {
+      console.log('游戏创建成功:', data);
       set({ gameId: data.gameId, gameMode: data.mode, currentScreen: 'game', message: '' });
     });
-    
+
     socket.on('waitingMatch', () => {
       set({ currentScreen: 'waiting', message: '正在匹配玩家中...' });
     });
-    
+
     socket.on('onlineCount', (data) => {
       set({ onlineCount: data.count || 0, matchingCount: data.matching || 0 });
     });
-    
+
     socket.on('matchCancelled', () => {
       set({ currentScreen: 'lobby', message: '' });
     });
-    
+
     socket.on('gameState', (state) => {
       set({ gameState: state });
     });
-    
+
     socket.on('opponentLeft', () => {
       set({ message: '对手已离开游戏', currentScreen: 'lobby' });
     });
-    
+
     return socket;
   },
   
