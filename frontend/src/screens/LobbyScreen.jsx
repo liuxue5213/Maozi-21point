@@ -7,7 +7,28 @@ import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from '../rnw';
 import useGameStore from '../store/gameStore';
 
 const LobbyScreen = () => {
-  const { playerName, startPvE, startMatch, connected, onlineCount } = useGameStore();
+  const { playerName, startPvE, startMatch, connected, onlineCount, error, clearError } = useGameStore();
+
+  React.useEffect(() => {
+    if (error) {
+      const timer = setTimeout(() => clearError(), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [error, clearError]);
+
+  const handlePvE = () => {
+    if (!connected) {
+      return;
+    }
+    startPvE();
+  };
+
+  const handleMatch = () => {
+    if (!connected) {
+      return;
+    }
+    startMatch();
+  };
 
   return (
     <View style={styles.container}>
@@ -24,34 +45,49 @@ const LobbyScreen = () => {
         </View>
         <View style={styles.statusArea}>
           <View style={[styles.statusDot, { backgroundColor: connected ? '#6b9b6a' : '#c9605a' }]} />
-          <Text style={styles.statusText}>{onlineCount}人在线</Text>
+          <Text style={styles.statusText}>{connected ? `${onlineCount}人在线` : '连接中...'}</Text>
         </View>
       </View>
+
+      {/* 错误提示 */}
+      {error ? (
+        <View style={styles.errorBar}>
+          <Text style={styles.errorText}>{error}</Text>
+        </View>
+      ) : null}
 
       {/* 内容 */}
       <ScrollView style={styles.content} contentContainerStyle={styles.contentInner}>
         <Text style={styles.label}>选择模式</Text>
-        
-        <TouchableOpacity style={styles.card} onPress={startPvE}>
+
+        <TouchableOpacity
+          style={[styles.card, !connected && styles.cardDisabled]}
+          onPress={handlePvE}
+          disabled={!connected}
+        >
           <View style={styles.cardIcon}>
             <Text style={styles.cardIconText}>🤖</Text>
           </View>
           <View style={styles.cardBody}>
             <Text style={styles.cardTitle}>人机对战</Text>
-            <Text style={styles.cardDesc}>与AI即时对局</Text>
+            <Text style={styles.cardDesc}>{connected ? '与AI即时对局' : '等待连接...'}</Text>
           </View>
-          <Text style={styles.cardArrow}>→</Text>
+          <Text style={[styles.cardArrow, !connected && styles.arrowDisabled]}>→</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.card} onPress={startMatch}>
+        <TouchableOpacity
+          style={[styles.card, !connected && styles.cardDisabled]}
+          onPress={handleMatch}
+          disabled={!connected}
+        >
           <View style={styles.cardIcon}>
             <Text style={styles.cardIconText}>⚔️</Text>
           </View>
           <View style={styles.cardBody}>
             <Text style={styles.cardTitle}>1V1 对战</Text>
-            <Text style={styles.cardDesc}>匹配真人玩家</Text>
+            <Text style={styles.cardDesc}>{connected ? '匹配真人玩家' : '等待连接...'}</Text>
           </View>
-          <Text style={styles.cardArrow}>→</Text>
+          <Text style={[styles.cardArrow, !connected && styles.arrowDisabled]}>→</Text>
         </TouchableOpacity>
 
         <View style={styles.rules}>
@@ -121,6 +157,20 @@ const styles = StyleSheet.create({
     fontSize: 11,
     color: '#b8b3ad',
   },
+  errorBar: {
+    backgroundColor: '#fee',
+    borderRadius: 8,
+    padding: 12,
+    marginHorizontal: 20,
+    marginTop: 12,
+    borderWidth: 1,
+    borderColor: '#fcc',
+  },
+  errorText: {
+    color: '#c33',
+    fontSize: 12,
+    textAlign: 'center',
+  },
   content: {
     flex: 1,
   },
@@ -144,6 +194,10 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     borderWidth: 1,
     borderColor: '#ebe7e2',
+  },
+  cardDisabled: {
+    opacity: 0.5,
+    backgroundColor: '#f5f3f0',
   },
   cardIcon: {
     width: 42,
@@ -172,6 +226,9 @@ const styles = StyleSheet.create({
   cardArrow: {
     fontSize: 16,
     color: '#d5d0ca',
+  },
+  arrowDisabled: {
+    opacity: 0.3,
   },
   rules: {
     marginTop: 10,

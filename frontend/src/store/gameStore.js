@@ -97,18 +97,24 @@ const useGameStore = create((set, get) => ({
   
   // 开始人机对战
   startPvE: () => {
-    const { socket } = get();
-    if (socket) {
-      socket.emit('startPvE');
+    const { socket, connected } = get();
+    if (!socket || !connected) {
+      set({ error: '网络连接中，请稍后...' });
+      return;
     }
+    console.log('开始人机对战...');
+    socket.emit('startPvE');
   },
-  
+
   // 开始匹配
   startMatch: () => {
-    const { socket } = get();
-    if (socket) {
-      socket.emit('startMatch');
+    const { socket, connected } = get();
+    if (!socket || !connected) {
+      set({ error: '网络连接中，请稍后...' });
+      return;
     }
+    console.log('开始匹配...');
+    socket.emit('startMatch');
   },
   
   // 取消匹配
@@ -164,7 +170,12 @@ const useGameStore = create((set, get) => ({
   
   // 返回大厅
   backToLobby: () => {
-    set({ currentScreen: 'lobby', gameId: null, gameState: null, message: '' });
+    set({ currentScreen: 'lobby', gameId: null, gameState: null, message: '', error: '' });
+  },
+
+  // 清除错误
+  clearError: () => {
+    set({ error: '' });
   },
 }));
 
