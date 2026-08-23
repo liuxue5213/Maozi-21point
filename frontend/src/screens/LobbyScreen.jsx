@@ -40,18 +40,25 @@ const LobbyScreen = () => {
           <View style={styles.avatar}>
             <Text style={styles.avatarText}>♠</Text>
           </View>
-          <View>
+          <View style={styles.playerDetails}>
             <Text style={styles.playerName}>{playerName}</Text>
             <Text style={styles.playerChips}>💰 {user?.chips || 1000}</Text>
           </View>
         </View>
-        <View style={styles.statusArea}>
-          <View style={[styles.statusDot, { backgroundColor: connected ? '#6b9b6a' : '#c9605a' }]} />
-          <Text style={styles.statusText}>{connected ? `${onlineCount}人在线` : '连接中...'}</Text>
+        <View style={styles.headerRight}>
+          <TouchableOpacity style={styles.checkinBtnSmall} onPress={() => setScreen('checkin')}>
+            <Text style={styles.checkinIconSmall}>📅</Text>
+          </TouchableOpacity>
           <TouchableOpacity style={styles.logoutBtn} onPress={logout}>
-            <Text style={styles.logoutBtnText}>登出</Text>
+            <Text style={styles.logoutBtnText}>退出</Text>
           </TouchableOpacity>
         </View>
+      </View>
+
+      {/* 状态栏 */}
+      <View style={styles.statusBar}>
+        <View style={[styles.statusDot, { backgroundColor: connected ? '#6b9b6a' : '#c9605a' }]} />
+        <Text style={styles.statusText}>{connected ? `${onlineCount}人在线` : '连接中...'}</Text>
       </View>
 
       {/* 错误提示 */}
@@ -113,13 +120,13 @@ const LobbyScreen = () => {
 
         {/* 快捷导航 */}
         <View style={styles.quickNav}>
+          <TouchableOpacity style={styles.quickNavBtn} onPress={() => setScreen('leaderboard')}>
+            <Text style={styles.quickNavIcon}>🏆</Text>
+            <Text style={styles.quickNavText}>排行榜</Text>
+          </TouchableOpacity>
           <TouchableOpacity style={styles.quickNavBtn} onPress={() => setScreen('profile')}>
             <Text style={styles.quickNavIcon}>👤</Text>
             <Text style={styles.quickNavText}>个人中心</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.quickNavBtn} onPress={() => setScreen('checkin')}>
-            <Text style={styles.quickNavIcon}>📅</Text>
-            <Text style={styles.quickNavText}>每日签到</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.quickNavBtn} onPress={() => setScreen('friends')}>
             <Text style={styles.quickNavIcon}>👥</Text>
@@ -132,10 +139,6 @@ const LobbyScreen = () => {
             </TouchableOpacity>
           )}
         </View>
-
-        <TouchableOpacity style={styles.leaderboardBtn} onPress={() => setScreen('leaderboard')}>
-          <Text style={styles.leaderboardBtnText}>🏆 排行榜</Text>
-        </TouchableOpacity>
       </ScrollView>
     </View>
   );
@@ -151,7 +154,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: 20,
-    paddingVertical: 14,
+    paddingVertical: 12,
     backgroundColor: 'white',
     borderBottomWidth: 1,
     borderBottomColor: '#ebe7e2',
@@ -160,32 +163,69 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 12,
+    flex: 1,
   },
   avatar: {
-    width: 38,
-    height: 38,
-    borderRadius: 10,
+    width: 40,
+    height: 40,
+    borderRadius: 12,
     backgroundColor: '#f0ece6',
     alignItems: 'center',
     justifyContent: 'center',
   },
   avatarText: {
-    fontSize: 14,
+    fontSize: 18,
     color: '#8a8580',
   },
+  playerDetails: {
+    gap: 2,
+  },
   playerName: {
-    fontSize: 15,
+    fontSize: 16,
     fontWeight: '600',
     color: '#4a4540',
   },
   playerChips: {
-    fontSize: 12,
-    color: '#c4a06a',
-    marginTop: 1,
+    fontSize: 13,
+    color: '#c4945c',
+    fontWeight: '500',
   },
-  statusArea: {
-    alignItems: 'flex-end',
-    gap: 3,
+  headerRight: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  checkinBtnSmall: {
+    width: 36,
+    height: 36,
+    borderRadius: 10,
+    backgroundColor: '#f0ece6',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  checkinIconSmall: {
+    fontSize: 18,
+  },
+  logoutBtn: {
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    backgroundColor: '#f0ece6',
+    borderRadius: 8,
+  },
+  logoutBtnText: {
+    fontSize: 11,
+    color: '#8a8580',
+    fontWeight: '500',
+  },
+  statusBar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 6,
+    paddingVertical: 8,
+    backgroundColor: 'white',
+    borderBottomWidth: 1,
+    borderBottomColor: '#f3f0eb',
   },
   statusDot: {
     width: 8,
@@ -193,18 +233,7 @@ const styles = StyleSheet.create({
     borderRadius: 4,
   },
   statusText: {
-    fontSize: 11,
-    color: '#b8b3ad',
-  },
-  logoutBtn: {
-    paddingVertical: 4,
-    paddingHorizontal: 8,
-    backgroundColor: '#f0ece6',
-    borderRadius: 4,
-    marginTop: 4,
-  },
-  logoutBtnText: {
-    fontSize: 10,
+    fontSize: 12,
     color: '#8a8580',
   },
   errorBar: {

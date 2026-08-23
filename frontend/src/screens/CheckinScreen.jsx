@@ -18,8 +18,8 @@ const CheckinScreen = ({ onBack }) => {
     try {
       const res = await fetch('/api/users/checkin/status', { headers: { Authorization: `Bearer ${token}` } });
       const data = await res.json();
-      setStreak(data.streak || 0);
-      setTodayChecked(data.todayChecked || false);
+      setStreak(data.status?.currentStreak || 0);
+      setTodayChecked(data.status?.checkedToday || false);
     } catch (e) { console.error(e); }
   };
 
@@ -29,7 +29,7 @@ const CheckinScreen = ({ onBack }) => {
     try {
       const res = await fetch('/api/users/checkin', { method: 'POST', headers: { Authorization: `Bearer ${token}` } });
       const data = await res.json();
-      if (res.ok) { setTodayChecked(true); setStreak(data.streak); window.alert(`获得 ${data.reward} 筹码！`); }
+      if (res.ok) { setTodayChecked(true); setStreak(data.checkin.streakDay); window.alert(`获得 ${data.checkin.totalReward} 筹码！`); }
       else window.alert(data.error || '签到失败');
     } catch (e) { window.alert('签到失败'); }
     setLoading(false);
