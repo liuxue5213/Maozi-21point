@@ -7,7 +7,7 @@ import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from '../rnw';
 import useGameStore from '../store/gameStore';
 
 const LobbyScreen = () => {
-  const { playerName, user, startPvE, startMatch, connected, onlineCount, error, clearError, logout } = useGameStore();
+  const { playerName, user, startPvE, startMatch, connected, onlineCount, error, clearError, logout, setScreen } = useGameStore();
 
   React.useEffect(() => {
     if (error) {
@@ -95,11 +95,23 @@ const LobbyScreen = () => {
 
         <View style={styles.rules}>
           <Text style={styles.rulesTitle}>游戏规则</Text>
-          <Text style={styles.ruleItem}>• 目标：接近21点，不超过</Text>
-          <Text style={styles.ruleItem}>• A=1或11，J/Q/K=10</Text>
-          <Text style={styles.ruleItem}>• 操作：要牌/停牌/加倍</Text>
-          <Text style={styles.ruleItem}>• Blackjack 1.5倍奖励</Text>
+          <View style={styles.ruleItem}>
+            <Text style={styles.ruleText}>• 目标：接近21点，不超过</Text>
+          </View>
+          <View style={styles.ruleItem}>
+            <Text style={styles.ruleText}>• A=1或11，J/Q/K=10</Text>
+          </View>
+          <View style={styles.ruleItem}>
+            <Text style={styles.ruleText}>• 操作：要牌/停牌/加倍</Text>
+          </View>
+          <View style={styles.ruleItem}>
+            <Text style={styles.ruleText}>• Blackjack 1.5倍奖励</Text>
+          </View>
         </View>
+
+        <TouchableOpacity style={styles.leaderboardBtn} onPress={() => setScreen('leaderboard')}>
+          <Text style={styles.leaderboardBtnText}>🏆 排行榜</Text>
+        </TouchableOpacity>
       </ScrollView>
     </View>
   );
@@ -251,6 +263,9 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     borderWidth: 1,
     borderColor: '#f3f0eb',
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'flex-start',
   },
   rulesTitle: {
     fontSize: 12,
@@ -259,10 +274,25 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   ruleItem: {
+    display: 'block',
+    width: '100%',
+  },
+  ruleText: {
     fontSize: 12,
-    color: '#b8b3ad',
-    lineHeight: 1.6,
-    flexWrap: 'wrap',
+    color: '#8a8580',
+    lineHeight: 1.8,
+  },
+  leaderboardBtn: {
+    marginTop: 16,
+    paddingVertical: 14,
+    backgroundColor: '#c4945c',
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  leaderboardBtnText: {
+    color: 'white',
+    fontSize: 14,
+    fontWeight: '600',
   },
 });
 

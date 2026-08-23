@@ -6,13 +6,13 @@ import React, { useEffect } from 'react';
 import { View, StyleSheet } from './rnw';
 import useGameStore from './store/gameStore';
 import AuthScreen from './screens/AuthScreen';
-import HomeScreen from './screens/HomeScreen';
 import LobbyScreen from './screens/LobbyScreen';
 import GameScreen from './screens/GameScreen';
 import WaitingScreen from './screens/WaitingScreen';
+import LeaderboardScreen from './screens/LeaderboardScreen';
 
 function App() {
-  const { currentScreen, connect, disconnect, isAuthenticated } = useGameStore();
+  const { currentScreen, connect, disconnect, isAuthenticated, setScreen } = useGameStore();
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -22,20 +22,19 @@ function App() {
   }, [isAuthenticated]);
 
   const renderScreen = () => {
-    // 未认证时显示登录/注册界面
     if (!isAuthenticated) {
       return <AuthScreen />;
     }
 
     switch (currentScreen) {
-      case 'home':
-        return <HomeScreen />;
       case 'lobby':
         return <LobbyScreen />;
       case 'game':
         return <GameScreen />;
       case 'waiting':
         return <WaitingScreen />;
+      case 'leaderboard':
+        return <LeaderboardScreen onBack={() => setScreen('lobby')} />;
       default:
         return <LobbyScreen />;
     }

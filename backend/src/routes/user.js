@@ -12,7 +12,24 @@ const { authMiddleware } = require('../middleware/auth');
 router.get('/leaderboard', async (req, res) => {
   try {
     const limit = parseInt(req.query.limit) || 100;
-    const leaderboard = await User.getLeaderboard(Math.min(limit, 200));
+    const sort = req.query.sort || 'chips'; // chips, wins, winRate
+
+    let orderBy = 'chips DESC';
+    if (sort === 'wins') {
+      orderBy = 'games_won DESC';
+    } else if (sort === 'winRate') {
+      orderBy = '(CAST(games_won AS REAL) / CASE WHEN games_played > 0 THEN games_played ELSE 1 END) DESC';
+    }
+
+    const leaderboard = await dbAsync.all(
+      `SELECT id, username, chips, games_played, games_won, level,
+              CASE WHEN games_played > 0 THEN ROUND(CAST(games_won AS REAL) / games_played * 100, 1) ELSE 0 END as win_rate
+       FROM users
+       WHERE status = 'active'
+       ORDER BY ${orderBy}
+       LIMIT ?`,
+      [Math.min(limit, 200)]
+    );
 
     res.json({
       leaderboard: leaderboard.map((user, index) => ({
@@ -22,6 +39,7 @@ router.get('/leaderboard', async (req, res) => {
         chips: user.chips,
         gamesPlayed: user.games_played,
         gamesWon: user.games_won,
+        winRate: `${user.win_rate}%`,
         level: user.level
       }))
     });
