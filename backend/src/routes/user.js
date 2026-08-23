@@ -5,7 +5,8 @@
 
 const express = require('express');
 const router = express.Router();
-const User = require('../models/User');
+const { User } = require('../models/User');
+const { dbAsync } = require('../database/db');
 const { authMiddleware } = require('../middleware/auth');
 
 // 获取排行榜
@@ -53,7 +54,17 @@ router.get('/leaderboard', async (req, res) => {
 router.get('/history', authMiddleware, async (req, res) => {
   try {
     const limit = parseInt(req.query.limit) || 50;
-    const history = await User.getGameHistory(req.userId, Math.min(limit, 100));
+    const rawHistory = await User.getGameHistory(req.userId, Math.min(limit, 100));
+
+    // 映射字段名以匹配前端期望
+    const history = rawHistory.map(h => ({
+      id: h.id,
+      mode: h.game_mode,
+      result: h.result,
+      chipsChange: h.chips_change,
+      date: h.created_at,
+      opponent: h.opponent_name
+    }));
 
     res.json({ history });
   } catch (error) {

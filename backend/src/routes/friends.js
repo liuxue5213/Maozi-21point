@@ -5,7 +5,7 @@
 
 const express = require('express');
 const router = express.Router();
-const User = require('../models/User');
+const { User } = require('../models/User');
 const { dbAsync } = require('../database/db');
 const { authMiddleware } = require('../middleware/auth');
 
@@ -52,7 +52,7 @@ router.get('/', async (req, res) => {
         chips: f.chips,
         level: f.level,
         lastLogin: f.last_login,
-        isOnline: isOnline(f.last_login),
+        online: isOnline(f.last_login),
         friendsSince: f.friends_since
       })),
       count: friendsList.length

@@ -162,6 +162,112 @@ function initializeTables() {
       )
     `);
 
+    // ============ 道具系统表 ============
+    
+    // 用户道具库存表
+    db.run(`
+      CREATE TABLE IF NOT EXISTS user_items (
+        user_id TEXT NOT NULL,
+        item_type TEXT NOT NULL,
+        count INTEGER DEFAULT 0,
+        updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        PRIMARY KEY (user_id, item_type),
+        FOREIGN KEY (user_id) REFERENCES users(id)
+      )
+    `);
+
+    // ============ 每日任务表 ============
+    
+    // 每日任务定义表
+    db.run(`
+      CREATE TABLE IF NOT EXISTS daily_tasks_def (
+        id TEXT PRIMARY KEY,
+        name TEXT NOT NULL,
+        description TEXT,
+        type TEXT NOT NULL,
+        target INTEGER NOT NULL,
+        reward INTEGER DEFAULT 0,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+
+    // 用户每日任务进度表
+    db.run(`
+      CREATE TABLE IF NOT EXISTS daily_tasks (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id TEXT NOT NULL,
+        task_id TEXT NOT NULL,
+        task_date DATE NOT NULL,
+        progress INTEGER DEFAULT 0,
+        completed BOOLEAN DEFAULT 0,
+        claimed BOOLEAN DEFAULT 0,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (user_id) REFERENCES users(id),
+        FOREIGN KEY (task_id) REFERENCES daily_tasks_def(id),
+        UNIQUE(user_id, task_id, task_date)
+      )
+    `);
+
+    // 每日免费道具领取记录
+    db.run(`
+      CREATE TABLE IF NOT EXISTS daily_free_claims (
+        user_id TEXT NOT NULL,
+        claim_date DATE NOT NULL,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        PRIMARY KEY (user_id, claim_date),
+        FOREIGN KEY (user_id) REFERENCES users(id)
+      )
+    `);
+
+    // ============ 破产保护表 ============
+    
+    db.run(`
+      CREATE TABLE IF NOT EXISTS bankruptcy_protection (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id TEXT NOT NULL,
+        claim_date DATE NOT NULL,
+        amount INTEGER DEFAULT 1000,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (user_id) REFERENCES users(id),
+        UNIQUE(user_id, claim_date)
+      )
+    `);
+
+    // ============ 比赛系统表 ============
+    
+    // 比赛表
+    db.run(`
+      CREATE TABLE IF NOT EXISTS tournaments (
+        id TEXT PRIMARY KEY,
+        name TEXT NOT NULL,
+        creator_id TEXT,
+        max_players INTEGER DEFAULT 8,
+        entry_fee INTEGER DEFAULT 0,
+        prize_pool INTEGER DEFAULT 0,
+        status TEXT DEFAULT 'pending',
+        start_time DATETIME,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        finished_at DATETIME,
+        FOREIGN KEY (creator_id) REFERENCES users(id)
+      )
+    `);
+
+    // 比赛玩家关联表
+    db.run(`
+      CREATE TABLE IF NOT EXISTS tournament_players (
+        tournament_id TEXT NOT NULL,
+        user_id TEXT NOT NULL,
+        chips_at_start INTEGER DEFAULT 0,
+        final_rank INTEGER,
+        prize INTEGER DEFAULT 0,
+        eliminated BOOLEAN DEFAULT 0,
+        joined_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        PRIMARY KEY (tournament_id, user_id),
+        FOREIGN KEY (tournament_id) REFERENCES tournaments(id),
+        FOREIGN KEY (user_id) REFERENCES users(id)
+      )
+    `);
+
     // 创建索引
     db.run('CREATE INDEX IF NOT EXISTS idx_game_history_user ON game_history(user_id)');
     db.run('CREATE INDEX IF NOT EXISTS idx_game_history_date ON game_history(created_at)');
@@ -174,9 +280,21 @@ function initializeTables() {
     db.run('CREATE INDEX IF NOT EXISTS idx_checkins_date ON checkins(checkin_date)');
     db.run('CREATE INDEX IF NOT EXISTS idx_announcements_active ON announcements(is_active)');
     db.run('CREATE INDEX IF NOT EXISTS idx_admin_logs_admin ON admin_logs(admin_id)');
+    
+    // 新表索引
+    db.run('CREATE INDEX IF NOT EXISTS idx_user_items_user ON user_items(user_id)');
+    db.run('CREATE INDEX IF NOT EXISTS idx_daily_tasks_user_date ON daily_tasks(user_id, task_date)');
+    db.run('CREATE INDEX IF NOT EXISTS idx_daily_tasks_def_type ON daily_tasks_def(type)');
+    db.run('CREATE INDEX IF NOT EXISTS idx_bankruptcy_protection_user ON bankruptcy_protection(user_id)');
+    db.run('CREATE INDEX IF NOT EXISTS idx_tournaments_status ON tournaments(status)');
+    db.run('CREATE INDEX IF NOT EXISTS idx_tournament_players_tournament ON tournament_players(tournament_id)');
+    db.run('CREATE INDEX IF NOT EXISTS idx_tournament_players_user ON tournament_players(user_id)');
 
     // 初始化成就数据
     initializeAchievements();
+    
+    // 初始化每日任务定义
+    initializeDailyTasks();
 
     console.log('✅ 数据库表初始化完成');
   });
@@ -215,6 +333,30 @@ function initializeAchievements() {
   stmt.finalize();
 
   console.log(`✅ 已初始化 ${achievements.length} 个成就`);
+}
+
+// 初始化每日任务定义数据
+function initializeDailyTasks() {
+  const tasks = [
+    { id: 'play_3', name: '每日游戏', description: '完成3局游戏', type: 'play_game', target: 3, reward: 200 },
+    { id: 'win_2', name: '每日胜利', description: '赢得2局游戏', type: 'win_game', target: 2, reward: 300 },
+    { id: 'get_blackjack', name: '黑杰克大师', description: '获得1次Blackjack', type: 'get_blackjack', target: 1, reward: 500 },
+    { id: 'play_10', name: '勤奋玩家', description: '完成10局游戏', type: 'play_game', target: 10, reward: 1000 },
+    { id: 'win_5', name: '连胜将军', description: '赢得5局游戏', type: 'win_game', target: 5, reward: 800 }
+  ];
+
+  const stmt = db.prepare(`
+    INSERT OR IGNORE INTO daily_tasks_def (id, name, description, type, target, reward)
+    VALUES (?, ?, ?, ?, ?, ?)
+  `);
+
+  tasks.forEach(t => {
+    stmt.run(t.id, t.name, t.description, t.type, t.target, t.reward);
+  });
+
+  stmt.finalize();
+
+  console.log(`✅ 已初始化 ${tasks.length} 个每日任务定义`);
 }
 
 // Promise化的数据库操作方法

@@ -5,7 +5,7 @@
 
 const express = require('express');
 const router = express.Router();
-const User = require('../models/User');
+const { User } = require('../models/User');
 const { dbAsync } = require('../database/db');
 const { authMiddleware } = require('../middleware/auth');
 
@@ -22,6 +22,8 @@ router.get('/', async (req, res) => {
 
     const totalGames = user.games_played || 0;
     const totalWins = user.games_won || 0;
+    const totalLosses = totalGames - totalWins; // 简化计算
+    const totalDraws = 0; // 暂时设为0
     const winRate = totalGames > 0 ? ((totalWins / totalGames) * 100).toFixed(1) : 0;
 
     // 计算最长连胜和当前连胜
@@ -54,12 +56,14 @@ router.get('/', async (req, res) => {
         avatar: user.avatar,
         chips: user.chips,
         level: user.level,
-        experience: user.experience,
+        exp: user.experience,
         stats: {
-          totalGames,
-          totalWins,
+          gamesPlayed: totalGames,
+          gamesWon: totalWins,
+          gamesLost: totalLosses,
+          gamesDraw: totalDraws,
           winRate: `${winRate}%`,
-          totalWinnings: user.total_winnings || 0,
+          totalChipsWon: user.total_winnings || 0,
           currentStreak: winStreak.current,
           maxStreak: winStreak.max,
           levelProgress: `${user.experience % 100}/100`
@@ -125,12 +129,12 @@ router.get('/history', async (req, res) => {
     res.json({
       history: history.map(h => ({
         id: h.id,
-        gameMode: h.game_mode,
+        mode: h.game_mode,
         result: h.result,
         chipsChange: h.chips_change,
-        opponentName: h.opponent_name,
+        opponent: h.opponent_name,
         duration: h.duration_seconds,
-        playedAt: h.created_at
+        date: h.created_at
       })),
       summary: {
         totalGames: summary.totalGames || 0,
