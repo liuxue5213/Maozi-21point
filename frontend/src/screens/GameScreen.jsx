@@ -96,7 +96,7 @@ const GameScreen = () => {
           <Text style={styles.backBtnText}>←</Text>
         </TouchableOpacity>
         <View style={styles.headerCenter}>
-          <Text style={styles.scoreText}>{score.win} - {score.lose} - {score.draw}</Text>
+          <Text style={styles.scoreText}>胜{score.win} 负{score.lose} 平{score.draw}</Text>
           <Text style={styles.modeText}>{gameMode === 'pve' ? '人机对战' : '1V1对战'}</Text>
         </View>
         <Text style={styles.chips}>💰{me?.chips || 0}</Text>

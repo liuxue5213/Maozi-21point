@@ -94,7 +94,7 @@ const LobbyScreen = () => {
           <Text style={styles.rulesTitle}>游戏规则</Text>
           <Text style={styles.ruleItem}>• 目标：接近21点，不超过</Text>
           <Text style={styles.ruleItem}>• A=1或11，J/Q/K=10</Text>
-          <Text style={styles.ruleItem}>• 操作：下注/跟注/加注/梭哈</Text>
+          <Text style={styles.ruleItem}>• 操作：要牌/停牌/加倍</Text>
           <Text style={styles.ruleItem}>• Blackjack 1.5倍奖励</Text>
         </View>
       </ScrollView>
@@ -247,7 +247,8 @@ const styles = StyleSheet.create({
   ruleItem: {
     fontSize: 12,
     color: '#b8b3ad',
-    lineHeight: 1.8,
+    lineHeight: 1.6,
+    flexWrap: 'wrap',
   },
 });
 
