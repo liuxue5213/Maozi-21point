@@ -70,6 +70,38 @@ const LobbyScreen = () => {
 
       {/* 内容 */}
       <ScrollView style={styles.content} contentContainerStyle={styles.contentInner}>
+        {/* 快捷功能按钮 - 模式选择上方 */}
+        <View style={styles.topNav}>
+          <TouchableOpacity style={styles.topNavBtn} onPress={() => setScreen('checkin')}>
+            <Text style={styles.topNavIcon}>📅</Text>
+            <Text style={styles.topNavText}>签到</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.topNavBtn} onPress={() => setScreen('leaderboard')}>
+            <Text style={styles.topNavIcon}>🏆</Text>
+            <Text style={styles.topNavText}>排行</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.topNavBtn} onPress={() => setScreen('profile')}>
+            <Text style={styles.topNavIcon}>👤</Text>
+            <Text style={styles.topNavText}>个人</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.topNavBtn} onPress={() => setScreen('friends')}>
+            <Text style={styles.topNavIcon}>👥</Text>
+            <Text style={styles.topNavText}>好友</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.topNavBtn} onPress={() => setScreen('chat')}>
+            <Text style={styles.topNavIcon}>💬</Text>
+            <Text style={styles.topNavText}>聊天</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.topNavBtn} onPress={() => setScreen('shop')}>
+            <Text style={styles.topNavIcon}>🛒</Text>
+            <Text style={styles.topNavText}>商店</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.topNavBtn} onPress={() => setScreen('more')}>
+            <Text style={styles.topNavIcon}>⋯</Text>
+            <Text style={styles.topNavText}>更多</Text>
+          </TouchableOpacity>
+        </View>
+
         <Text style={styles.label}>选择模式</Text>
 
         <TouchableOpacity
@@ -119,25 +151,6 @@ const LobbyScreen = () => {
         </View>
       </ScrollView>
 
-      {/* 底部导航 - 固定在屏幕底部 */}
-      <View style={styles.bottomNav}>
-        <TouchableOpacity style={styles.bottomNavBtn} onPress={() => setScreen('checkin')}>
-          <Text style={styles.bottomNavIcon}>📅</Text>
-          <Text style={styles.bottomNavText}>签到</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.bottomNavBtn} onPress={() => setScreen('leaderboard')}>
-          <Text style={styles.bottomNavIcon}>🏆</Text>
-          <Text style={styles.bottomNavText}>排行</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.bottomNavBtn} onPress={() => setScreen('profile')}>
-          <Text style={styles.bottomNavIcon}>👤</Text>
-          <Text style={styles.bottomNavText}>个人</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.bottomNavBtn} onPress={() => setScreen('more')}>
-          <Text style={styles.bottomNavIcon}>⋯</Text>
-          <Text style={styles.bottomNavText}>更多</Text>
-        </TouchableOpacity>
-      </View>
     </View>
   );
 };
@@ -262,27 +275,28 @@ const styles = StyleSheet.create({
     textTransform: 'uppercase',
     letterSpacing: 1,
   },
-  bottomNav: {
+  topNav: {
     flexDirection: 'row',
-    backgroundColor: 'white',
-    borderTopWidth: 1,
-    borderTopColor: '#ebe7e2',
-    paddingVertical: 8,
-    paddingHorizontal: 12,
+    gap: 6,
+    marginBottom: 12,
+    flexWrap: 'wrap',
   },
-  bottomNavBtn: {
-    flex: 1,
+  topNavBtn: {
+    width: '23%',
     alignItems: 'center',
     gap: 2,
-    paddingVertical: 6,
+    paddingVertical: 8,
+    backgroundColor: 'white',
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#ebe7e2',
   },
-  bottomNavIcon: {
-    fontSize: 18,
+  topNavIcon: {
+    fontSize: 14,
   },
-  bottomNavText: {
-    fontSize: 10,
+  topNavText: {
+    fontSize: 9,
     color: '#7a7068',
-    fontWeight: '500',
   },
   card: {
     flexDirection: 'row',
