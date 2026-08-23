@@ -48,7 +48,7 @@ const GameScreen = () => {
     } else if (me.result === 'push') {
       setScore(prev => ({ ...prev, draw: prev.draw + 1 }));
     }
-  }, [gameState, playerId, lastResult]);
+  }, [gameState?.state, playerId, lastResult]);
 
   // 重置比分（新一轮游戏时）
   useEffect(() => {
