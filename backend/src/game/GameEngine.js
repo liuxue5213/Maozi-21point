@@ -66,7 +66,7 @@ class GameEngine {
     this.maxBet = 500;
   }
 
-  addPlayer(playerId, playerName, chips = 1000) {
+  addPlayer(playerId, playerName, chips = 1000, isAI = false) {
     this.players.set(playerId, {
       id: playerId,
       name: playerName,
@@ -77,9 +77,11 @@ class GameEngine {
       stood: false,
       busted: false,
       blackjack: false,
+      blackjack: false,
       allIn: false,
-      result: null, // 'win' | 'lose' | 'push' | 'blackjack'
+      result: null,
       winAmount: 0,
+      isAI: isAI, // 标记是否为AI玩家
     });
   }
 
@@ -141,10 +143,12 @@ class GameEngine {
     this.dealer.cards.push(this.deck.deal());
     this.dealer.cards.push(this.deck.deal());
 
-    // 设置第一个行动的玩家
+    // 设置第一个行动的玩家（人类玩家优先）
     const activePlayers = [...this.players.values()].filter(p => p.cards.length > 0);
     if (activePlayers.length > 0) {
-      this.currentTurn = activePlayers[0].id;
+      // 在PvE中确保人类玩家先行动
+      const humanPlayer = activePlayers.find(p => !p.isAI);
+      this.currentTurn = humanPlayer ? humanPlayer.id : activePlayers[0].id;
     }
 
     return true;

@@ -38,10 +38,10 @@ function initSocket(io) {
       
       // 添加玩家
       game.addPlayer(socket.id, socket.playerName, 1000);
-      
-      // 添加AI
+
+      // 添加AI (在PvE中确保人类玩家先行动)
       const ai = new AIPlayer('medium');
-      game.addPlayer('ai_1', ai.name, 1000);
+      game.addPlayer('ai_1', ai.name, 1000, true); // AI总是第二个行动
       
       games.set(gameId, game);
       playerGameMap.set(socket.id, gameId);
