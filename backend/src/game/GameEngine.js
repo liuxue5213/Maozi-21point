@@ -7,10 +7,19 @@ const { Deck } = require('./Deck');
 
 // 计算手牌点数
 function calculateHand(cards) {
+  // 安全检查：空数组或无效卡片
+  if (!cards || !Array.isArray(cards) || cards.length === 0) {
+    return 0;
+  }
+
   let total = 0;
   let aces = 0;
 
   for (const card of cards) {
+    // 检查卡片是否有效
+    if (!card || typeof card.value !== 'number') {
+      continue;
+    }
     total += card.value;
     if (card.rank === 'A') aces++;
   }
@@ -292,10 +301,12 @@ class GameEngine {
       round: this.round,
       players,
       dealer: {
-        cards: this.dealer.hidden
+        cards: this.dealer.hidden && this.dealer.cards.length > 0
           ? [this.dealer.cards[0], { hidden: true }]
           : this.dealer.cards,
-        score: this.dealer.hidden ? calculateHand([this.dealer.cards[0]]) : calculateHand(this.dealer.cards),
+        score: this.dealer.hidden && this.dealer.cards.length > 0
+          ? calculateHand([this.dealer.cards[0]])
+          : calculateHand(this.dealer.cards),
       },
       currentTurn: this.currentTurn,
       minBet: this.minBet,
