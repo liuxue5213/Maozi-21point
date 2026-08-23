@@ -174,11 +174,6 @@ const GameScreen = () => {
             </TouchableOpacity>
           </View>
         )}
-        {!isBetting && !isPlaying && !isFinished && !isDealerTurn && (
-          <View style={styles.debugInfo}>
-            <Text style={styles.debugText}>未知状态: {gameState.state}</Text>
-          </View>
-        )}
       </View>
     </View>
   );

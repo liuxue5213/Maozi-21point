@@ -35,7 +35,8 @@ const GameActions = ({ gameState, playerId }) => {
     );
   }
 
-  if (!isMyTurn || !player) {
+  // 在非finished状态下，如果没有玩家或不是我的回合，显示等待
+  if (!player || (!isMyTurn && gameState?.state !== 'betting')) {
     return (
       <View style={styles.container}>
         <Text style={styles.waiting}>等待中...</Text>

@@ -330,6 +330,7 @@ class GameEngine {
         allIn: player.allIn,
         result: player.result,
         winAmount: player.winAmount,
+        isAI: player.isAI, // 添加AI标识
       });
     }
 
