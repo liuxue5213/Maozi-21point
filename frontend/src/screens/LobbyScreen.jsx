@@ -70,26 +70,6 @@ const LobbyScreen = () => {
 
       {/* 内容 */}
       <ScrollView style={styles.content} contentContainerStyle={styles.contentInner}>
-        {/* 快捷功能按钮 - 在模式选择上方 */}
-        <View style={styles.topQuickNav}>
-          <TouchableOpacity style={styles.topQuickBtn} onPress={() => setScreen('checkin')}>
-            <Text style={styles.topQuickIcon}>📅</Text>
-            <Text style={styles.topQuickText}>签到</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.topQuickBtn} onPress={() => setScreen('leaderboard')}>
-            <Text style={styles.topQuickIcon}>🏆</Text>
-            <Text style={styles.topQuickText}>排行</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.topQuickBtn} onPress={() => setScreen('profile')}>
-            <Text style={styles.topQuickIcon}>👤</Text>
-            <Text style={styles.topQuickText}>个人</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.topQuickBtn} onPress={() => setScreen('more')}>
-            <Text style={styles.topQuickIcon}>⋯</Text>
-            <Text style={styles.topQuickText}>更多</Text>
-          </TouchableOpacity>
-        </View>
-
         <Text style={styles.label}>选择模式</Text>
 
         <TouchableOpacity
@@ -137,9 +117,27 @@ const LobbyScreen = () => {
             <Text style={styles.ruleText}>• Blackjack 1.5倍奖励</Text>
           </View>
         </View>
-
-        {/* 底部留白 */}
       </ScrollView>
+
+      {/* 底部导航 - 固定在屏幕底部 */}
+      <View style={styles.bottomNav}>
+        <TouchableOpacity style={styles.bottomNavBtn} onPress={() => setScreen('checkin')}>
+          <Text style={styles.bottomNavIcon}>📅</Text>
+          <Text style={styles.bottomNavText}>签到</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.bottomNavBtn} onPress={() => setScreen('leaderboard')}>
+          <Text style={styles.bottomNavIcon}>🏆</Text>
+          <Text style={styles.bottomNavText}>排行</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.bottomNavBtn} onPress={() => setScreen('profile')}>
+          <Text style={styles.bottomNavIcon}>👤</Text>
+          <Text style={styles.bottomNavText}>个人</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.bottomNavBtn} onPress={() => setScreen('more')}>
+          <Text style={styles.bottomNavIcon}>⋯</Text>
+          <Text style={styles.bottomNavText}>更多</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 };
@@ -264,26 +262,24 @@ const styles = StyleSheet.create({
     textTransform: 'uppercase',
     letterSpacing: 1,
   },
-  topQuickNav: {
+  bottomNav: {
     flexDirection: 'row',
-    gap: 8,
-    marginBottom: 16,
-  },
-  topQuickBtn: {
-    flex: 1,
-    flexDirection: 'column',
-    alignItems: 'center',
-    gap: 4,
-    paddingVertical: 10,
     backgroundColor: 'white',
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: '#ebe7e2',
+    borderTopWidth: 1,
+    borderTopColor: '#ebe7e2',
+    paddingVertical: 8,
+    paddingHorizontal: 12,
   },
-  topQuickIcon: {
+  bottomNavBtn: {
+    flex: 1,
+    alignItems: 'center',
+    gap: 2,
+    paddingVertical: 6,
+  },
+  bottomNavIcon: {
     fontSize: 18,
   },
-  topQuickText: {
+  bottomNavText: {
     fontSize: 10,
     color: '#7a7068',
     fontWeight: '500',
