@@ -12,6 +12,11 @@ const { initSocket } = require('./socket/gameSocket');
 const { socketAuthMiddleware } = require('./middleware/auth');
 const authRoutes = require('./routes/auth');
 const userRoutes = require('./routes/user');
+const profileRoutes = require('./routes/profile');
+const checkinRoutes = require('./routes/checkin');
+const friendRoutes = require('./routes/friends');
+const achievementRoutes = require('./routes/achievements');
+const adminRoutes = require('./routes/admin');
 
 // 初始化数据库
 require('./database/db');
@@ -47,6 +52,11 @@ app.get('/api/status', (req, res) => {
 // 认证和用户路由
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
+app.use('/api/users/profile', profileRoutes);
+app.use('/api/users/checkin', checkinRoutes);
+app.use('/api/users/friends', friendRoutes);
+app.use('/api/users/achievements', achievementRoutes);
+app.use('/api/admin', adminRoutes);
 
 // 静态文件服务（前端构建产物）
 app.use(express.static(path.join(__dirname, '../../frontend/dist')));

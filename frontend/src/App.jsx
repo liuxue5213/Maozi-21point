@@ -10,6 +10,10 @@ import LobbyScreen from './screens/LobbyScreen';
 import GameScreen from './screens/GameScreen';
 import WaitingScreen from './screens/WaitingScreen';
 import LeaderboardScreen from './screens/LeaderboardScreen';
+import ProfileScreen from './screens/ProfileScreen';
+import CheckinScreen from './screens/CheckinScreen';
+import FriendsScreen from './screens/FriendsScreen';
+import AdminScreen from './screens/AdminScreen';
 
 function App() {
   const { currentScreen, connect, disconnect, isAuthenticated, setScreen } = useGameStore();
@@ -35,6 +39,14 @@ function App() {
         return <WaitingScreen />;
       case 'leaderboard':
         return <LeaderboardScreen onBack={() => setScreen('lobby')} />;
+      case 'profile':
+        return <ProfileScreen onBack={() => setScreen('lobby')} />;
+      case 'checkin':
+        return <CheckinScreen onBack={() => setScreen('lobby')} />;
+      case 'friends':
+        return <FriendsScreen onBack={() => setScreen('lobby')} />;
+      case 'admin':
+        return <AdminScreen onBack={() => setScreen('lobby')} />;
       default:
         return <LobbyScreen />;
     }

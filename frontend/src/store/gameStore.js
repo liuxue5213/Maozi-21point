@@ -42,6 +42,21 @@ const useGameStore = create((set, get) => ({
   onlineCount: 0,
   matchingCount: 0,
 
+  // 签到状态
+  checkinStreak: 0,
+  checkinToday: false,
+
+  // 好友列表
+  friends: [],
+  friendRequests: [],
+
+  // 成就
+  achievements: [],
+
+  // 当前用户完整信息
+  userLevel: 1,
+  userExp: 0,
+
   // 登录
   login: (token, user) => {
     localStorage.setItem('token', token);
@@ -254,6 +269,100 @@ const useGameStore = create((set, get) => ({
   // 清除错误
   clearError: () => {
     set({ error: '' });
+  },
+
+  // 签到
+  checkin: async () => {
+    const { token } = get();
+    try {
+      const response = await fetch('/api/users/checkin', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+      const data = await response.json();
+      if (response.ok) {
+        set({
+          checkinStreak: data.streak || 0,
+          checkinToday: true,
+          user: { ...get().user, chips: data.chips ?? get().user?.chips }
+        });
+        return { success: true, data };
+      } else {
+        return { success: false, error: data.error || '签到失败' };
+      }
+    } catch (error) {
+      console.error('签到失败:', error);
+      return { success: false, error: '网络错误' };
+    }
+  },
+
+  // 获取好友列表
+  fetchFriends: async () => {
+    const { token } = get();
+    try {
+      const response = await fetch('/api/users/friends', {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      const data = await response.json();
+      if (response.ok) {
+        set({ friends: data.friends || [], friendRequests: data.requests || [] });
+      }
+    } catch (error) {
+      console.error('获取好友列表失败:', error);
+    }
+  },
+
+  // 添加好友
+  addFriend: async (username) => {
+    const { token } = get();
+    try {
+      const response = await fetch('/api/users/friends/add', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ username })
+      });
+      const data = await response.json();
+      if (response.ok) {
+        return { success: true, data };
+      } else {
+        return { success: false, error: data.error || '添加失败' };
+      }
+    } catch (error) {
+      console.error('添加好友失败:', error);
+      return { success: false, error: '网络错误' };
+    }
+  },
+
+  // 获取成就
+  fetchAchievements: async () => {
+    const { token } = get();
+    try {
+      const response = await fetch('/api/users/achievements', {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      const data = await response.json();
+      if (response.ok) {
+        set({ achievements: data.achievements || [] });
+      }
+    } catch (error) {
+      console.error('获取成就失败:', error);
+    }
+  },
+
+  // 更新用户信息
+  updateUserInfo: (data) => {
+    set({
+      user: { ...get().user, ...data },
+      userLevel: data.level ?? get().userLevel,
+      userExp: data.exp ?? get().userExp,
+      playerName: data.username ?? get().playerName,
+    });
   },
 }));
 

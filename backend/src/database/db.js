@@ -123,6 +123,45 @@ function initializeTables() {
       )
     `);
 
+    // 签到表
+    db.run(`
+      CREATE TABLE IF NOT EXISTS checkins (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id TEXT NOT NULL,
+        checkin_date DATE NOT NULL,
+        streak INTEGER DEFAULT 1,
+        reward INTEGER DEFAULT 50,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (user_id) REFERENCES users(id),
+        UNIQUE(user_id, checkin_date)
+      )
+    `);
+
+    // 公告表
+    db.run(`
+      CREATE TABLE IF NOT EXISTS announcements (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        title TEXT NOT NULL,
+        content TEXT,
+        type TEXT DEFAULT 'normal',
+        is_active BOOLEAN DEFAULT 1,
+        created_by TEXT,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (created_by) REFERENCES users(id)
+      )
+    `);
+
+    // 系统配置表
+    db.run(`
+      CREATE TABLE IF NOT EXISTS system_config (
+        key TEXT PRIMARY KEY,
+        value TEXT,
+        description TEXT,
+        updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+
     // 创建索引
     db.run('CREATE INDEX IF NOT EXISTS idx_game_history_user ON game_history(user_id)');
     db.run('CREATE INDEX IF NOT EXISTS idx_game_history_date ON game_history(created_at)');
@@ -131,6 +170,10 @@ function initializeTables() {
     db.run('CREATE INDEX IF NOT EXISTS idx_user_achievements_user ON user_achievements(user_id)');
     db.run('CREATE INDEX IF NOT EXISTS idx_users_chips ON users(chips DESC)');
     db.run('CREATE INDEX IF NOT EXISTS idx_users_username ON users(username)');
+    db.run('CREATE INDEX IF NOT EXISTS idx_checkins_user ON checkins(user_id)');
+    db.run('CREATE INDEX IF NOT EXISTS idx_checkins_date ON checkins(checkin_date)');
+    db.run('CREATE INDEX IF NOT EXISTS idx_announcements_active ON announcements(is_active)');
+    db.run('CREATE INDEX IF NOT EXISTS idx_admin_logs_admin ON admin_logs(admin_id)');
 
     // 初始化成就数据
     initializeAchievements();

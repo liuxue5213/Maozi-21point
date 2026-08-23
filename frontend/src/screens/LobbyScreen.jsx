@@ -9,6 +9,8 @@ import useGameStore from '../store/gameStore';
 const LobbyScreen = () => {
   const { playerName, user, startPvE, startMatch, connected, onlineCount, error, clearError, logout, setScreen } = useGameStore();
 
+  const isAdmin = user?.role === 'admin' || user?.isAdmin === true;
+
   React.useEffect(() => {
     if (error) {
       const timer = setTimeout(() => clearError(), 3000);
@@ -107,6 +109,28 @@ const LobbyScreen = () => {
           <View style={styles.ruleItem}>
             <Text style={styles.ruleText}>• Blackjack 1.5倍奖励</Text>
           </View>
+        </View>
+
+        {/* 快捷导航 */}
+        <View style={styles.quickNav}>
+          <TouchableOpacity style={styles.quickNavBtn} onPress={() => setScreen('profile')}>
+            <Text style={styles.quickNavIcon}>👤</Text>
+            <Text style={styles.quickNavText}>个人中心</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.quickNavBtn} onPress={() => setScreen('checkin')}>
+            <Text style={styles.quickNavIcon}>📅</Text>
+            <Text style={styles.quickNavText}>每日签到</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.quickNavBtn} onPress={() => setScreen('friends')}>
+            <Text style={styles.quickNavIcon}>👥</Text>
+            <Text style={styles.quickNavText}>好友</Text>
+          </TouchableOpacity>
+          {isAdmin && (
+            <TouchableOpacity style={styles.quickNavBtn} onPress={() => setScreen('admin')}>
+              <Text style={styles.quickNavIcon}>🔧</Text>
+              <Text style={styles.quickNavText}>管理后台</Text>
+            </TouchableOpacity>
+          )}
         </View>
 
         <TouchableOpacity style={styles.leaderboardBtn} onPress={() => setScreen('leaderboard')}>
@@ -281,6 +305,30 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#8a8580',
     lineHeight: 1.8,
+  },
+  quickNav: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 10,
+    marginTop: 16,
+  },
+  quickNavBtn: {
+    width: '48%',
+    paddingVertical: 12,
+    backgroundColor: 'white',
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#ebe7e2',
+    alignItems: 'center',
+    gap: 4,
+  },
+  quickNavIcon: {
+    fontSize: 18,
+  },
+  quickNavText: {
+    fontSize: 12,
+    color: '#7a7068',
+    fontWeight: '500',
   },
   leaderboardBtn: {
     marginTop: 16,
