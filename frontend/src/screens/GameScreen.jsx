@@ -10,7 +10,7 @@ import BettingControls from '../components/BettingControls';
 import GameActions from '../components/GameActions';
 
 const GameScreen = () => {
-  const { gameState, playerId, gameMode, backToLobby } = useGameStore();
+  const { gameState, playerId, gameMode, backToLobby, user, updateUserInfo } = useGameStore();
   const [score, setScore] = useState({ win: 0, lose: 0, draw: 0 });
   const [lastResult, setLastResult] = useState(null);
 
@@ -35,6 +35,11 @@ const GameScreen = () => {
     if (!me || !me.result || me.result === lastResult) return;
 
     setLastResult(me.result);
+
+    // 更新用户筹码到全局状态
+    if (me.chips !== undefined && updateUserInfo) {
+      updateUserInfo({ chips: me.chips });
+    }
 
     if (me.result === 'win' || me.result === 'blackjack') {
       setScore(prev => ({ ...prev, win: prev.win + 1 }));
@@ -68,6 +73,9 @@ const GameScreen = () => {
   const isFinished = gameState.state === 'finished';
   const isDealerTurn = gameState.state === 'dealer';
 
+  // 调试日志
+  console.log('GameScreen 更新:', { playerId, meChips: me?.chips, state: gameState.state });
+
   const getResultText = (result) => {
     switch (result) {
       case 'win': return '获胜';
@@ -99,7 +107,7 @@ const GameScreen = () => {
           <Text style={styles.scoreText}>胜{score.win} 负{score.lose} 平{score.draw}</Text>
           <Text style={styles.modeText}>{gameMode === 'pve' ? '人机对战' : '1V1对战'}</Text>
         </View>
-        <Text style={styles.chips}>💰{me?.chips || 0}</Text>
+        <Text style={styles.chips}>💰{me?.chips ?? user?.chips ?? 0}</Text>
       </View>
 
       {/* 游戏桌面 */}

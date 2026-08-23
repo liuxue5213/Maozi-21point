@@ -120,6 +120,10 @@ const LobbyScreen = () => {
 
         {/* 快捷导航 */}
         <View style={styles.quickNav}>
+          <TouchableOpacity style={styles.quickNavBtn} onPress={() => setScreen('checkin')}>
+            <Text style={styles.quickNavIcon}>📅</Text>
+            <Text style={styles.quickNavText}>签到</Text>
+          </TouchableOpacity>
           <TouchableOpacity style={styles.quickNavBtn} onPress={() => setScreen('leaderboard')}>
             <Text style={styles.quickNavIcon}>🏆</Text>
             <Text style={styles.quickNavText}>排行榜</Text>
