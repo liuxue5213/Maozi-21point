@@ -96,10 +96,6 @@ const LobbyScreen = () => {
             <Text style={styles.topNavIcon}>🛒</Text>
             <Text style={styles.topNavText}>商店</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.topNavBtn} onPress={() => setScreen('more')}>
-            <Text style={styles.topNavIcon}>⋯</Text>
-            <Text style={styles.topNavText}>更多</Text>
-          </TouchableOpacity>
         </View>
 
         <Text style={styles.label}>选择模式</Text>
