@@ -103,7 +103,7 @@ const GameScreen = () => {
       </View>
 
       {/* 游戏桌面 */}
-      <ScrollView style={styles.table} contentContainerStyle={styles.tableContent}>
+      <ScrollView style={styles.table} contentContainerStyle={styles.tableContent} showsVerticalScrollIndicator={false}>
         {/* 庄家 */}
         <View style={styles.dealerArea}>
           <Hand cards={gameState.dealer.cards} score={gameState.dealer.score} label="庄家" />
@@ -203,18 +203,19 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
     backgroundColor: '#ffffff',
     borderBottomWidth: 1,
     borderBottomColor: '#e8e2d8',
+    minHeight: 44, // 确保头部有固定高度
   },
   backBtn: {
-    paddingVertical: 6,
-    paddingHorizontal: 10,
+    paddingVertical: 4,
+    paddingHorizontal: 8,
   },
   backBtnText: {
-    fontSize: 20,
+    fontSize: 18,
     color: '#7a7068',
   },
   headerCenter: {
@@ -238,14 +239,16 @@ const styles = StyleSheet.create({
   },
   table: {
     flex: 1,
+    maxHeight: 'calc(100vh - 180px)', // 确保为操作按钮留出足够空间
   },
   tableContent: {
-    padding: 16,
-    gap: 10,
+    padding: 12,
+    gap: 8,
+    paddingBottom: 20,
   },
   dealerArea: {
     alignItems: 'center',
-    paddingVertical: 8,
+    paddingVertical: 6,
   },
   statusArea: {
     alignItems: 'center',
@@ -265,9 +268,9 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   oppCard: {
-    padding: 12,
+    padding: 8,
     backgroundColor: '#ffffff',
-    borderRadius: 10,
+    borderRadius: 8,
     borderWidth: 1,
     borderColor: '#e8e2d8',
   },
@@ -327,8 +330,8 @@ const styles = StyleSheet.create({
   },
   myArea: {
     alignItems: 'center',
-    gap: 6,
-    paddingVertical: 8,
+    gap: 4,
+    paddingVertical: 6,
   },
   resultText: {
     fontSize: 16,

@@ -60,7 +60,7 @@ const BettingControls = ({ gameState, playerId }) => {
 
 const styles = StyleSheet.create({
   container: {
-    padding: 16,
+    padding: 12,
     backgroundColor: 'white',
     borderTopWidth: 1,
     borderTopColor: '#e8e2d8',
@@ -68,7 +68,7 @@ const styles = StyleSheet.create({
   infoRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: 12,
+    marginBottom: 8,
   },
   chips: {
     fontSize: 15,
@@ -81,8 +81,8 @@ const styles = StyleSheet.create({
   },
   quickRow: {
     flexDirection: 'row',
-    gap: 8,
-    marginBottom: 12,
+    gap: 6,
+    marginBottom: 8,
   },
   quickBtn: {
     flex: 1,

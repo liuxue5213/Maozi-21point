@@ -68,33 +68,33 @@ const GameActions = ({ gameState, playerId }) => {
 
 const styles = StyleSheet.create({
   container: {
-    padding: 16,
+    padding: 12,
     backgroundColor: 'white',
     borderTopWidth: 1,
     borderTopColor: '#e8e2d8',
   },
   row: {
     flexDirection: 'row',
-    gap: 10,
-    marginBottom: 6,
+    gap: 8,
+    marginBottom: 4,
   },
   hitBtn: {
     flex: 1,
-    paddingVertical: 13,
+    paddingVertical: 10,
     backgroundColor: '#5b8c5a',
     borderRadius: 8,
     alignItems: 'center',
   },
   standBtn: {
     flex: 1,
-    paddingVertical: 13,
+    paddingVertical: 10,
     backgroundColor: '#c9584a',
     borderRadius: 8,
     alignItems: 'center',
   },
   doubleBtn: {
     flex: 1,
-    paddingVertical: 13,
+    paddingVertical: 10,
     backgroundColor: '#c4945c',
     borderRadius: 8,
     alignItems: 'center',
