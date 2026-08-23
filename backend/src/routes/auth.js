@@ -26,6 +26,11 @@ router.post('/register', async (req, res) => {
       return res.status(400).json({ error: '密码长度至少6个字符' });
     }
 
+    // 验证用户名格式（只允许字母、数字、下划线）
+    if (!/^[a-zA-Z0-9_]+$/.test(username)) {
+      return res.status(400).json({ error: '用户名只能包含字母、数字和下划线' });
+    }
+
     // 检查用户名是否已存在
     const existingUser = await User.findByUsername(username);
     if (existingUser) {

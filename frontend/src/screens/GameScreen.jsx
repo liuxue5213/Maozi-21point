@@ -73,9 +73,6 @@ const GameScreen = () => {
   const isFinished = gameState.state === 'finished';
   const isDealerTurn = gameState.state === 'dealer';
 
-  // 调试日志
-  console.log('GameScreen 更新:', { playerId, meChips: me?.chips, state: gameState.state });
-
   const getResultText = (result) => {
     switch (result) {
       case 'win': return '获胜';

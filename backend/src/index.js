@@ -9,8 +9,8 @@ const { Server } = require('socket.io');
 const cors = require('cors');
 const path = require('path');
 const { initSocket } = require('./socket/gameSocket');
-const { initChatHandlers } = require('./socket/chatHandlers');
 const { socketAuthMiddleware } = require('./middleware/auth');
+const { errorHandler, notFoundHandler } = require('./middleware/errorHandler');
 const authRoutes = require('./routes/auth');
 const userRoutes = require('./routes/user');
 const profileRoutes = require('./routes/profile');
@@ -84,7 +84,10 @@ io.use(socketAuthMiddleware);
 
 // 初始化Socket
 initSocket(io);
-initChatHandlers(io);
+
+// 错误处理（必须放在路由后面）
+app.use(notFoundHandler);
+app.use(errorHandler);
 
 // 启动服务
 server.listen(PORT, '0.0.0.0', () => {

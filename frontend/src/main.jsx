@@ -5,6 +5,7 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
 import App from './App';
+import { ToastProvider } from './components/Toast';
 
 // React Native Web 全局样式
 const globalStyle = document.createElement('style');
@@ -27,6 +28,8 @@ document.head.appendChild(globalStyle);
 const container = document.getElementById('root');
 createRoot(container).render(
   <React.StrictMode>
-    <App />
+    <ToastProvider>
+      <App />
+    </ToastProvider>
   </React.StrictMode>
 );
