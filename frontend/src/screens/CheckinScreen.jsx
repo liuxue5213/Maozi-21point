@@ -1,3 +1,4 @@
+import { toast } from "../utils/toast";
 /**
  * 帽子21点 - 每日签到
  */
@@ -29,9 +30,9 @@ const CheckinScreen = ({ onBack }) => {
     try {
       const res = await fetch('/api/users/checkin', { method: 'POST', headers: { Authorization: `Bearer ${token}` } });
       const data = await res.json();
-      if (res.ok) { setTodayChecked(true); setStreak(data.checkin.streakDay); window.alert(`获得 ${data.checkin.totalReward} 筹码！`); }
-      else window.alert(data.error || '签到失败');
-    } catch (e) { window.alert('签到失败'); }
+      if (res.ok) { setTodayChecked(true); setStreak(data.checkin.streakDay); toast.info(`获得 ${data.checkin.totalReward} 筹码！`); }
+      else toast.info(data.error || '签到失败');
+    } catch (e) { toast.info('签到失败'); }
     setLoading(false);
   };
 

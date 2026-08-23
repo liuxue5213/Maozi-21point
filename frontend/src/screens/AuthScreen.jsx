@@ -1,3 +1,4 @@
+import { toast } from "../utils/toast";
 /**
  * 帽子21点 - 登录/注册界面
  */
@@ -7,7 +8,7 @@ import { View, Text, TextInput, TouchableOpacity, StyleSheet } from '../rnw';
 import useGameStore from '../store/gameStore';
 
 const showAlert = (title, message) => {
-  window.alert(`${title}: ${message}`);
+  toast.info(`${title}: ${message}`);
 };
 
 const AuthScreen = ({ onAuthSuccess }) => {

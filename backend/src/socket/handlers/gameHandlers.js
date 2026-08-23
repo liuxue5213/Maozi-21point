@@ -6,6 +6,7 @@
 const { GameEngine, GameState } = require('../../game/GameEngine');
 const { AIPlayer } = require('../../game/AIPlayer');
 const { User } = require('../../models/User');
+const logger = require('../../utils/logger');
 
 // 共享状态（从主socket文件导入）
 let games, matchQueue, playerGameMap, playerChipsMap, aiTimers;
@@ -214,7 +215,7 @@ async function saveGameResult(socket, result, mode, opponent, duration) {
       level: (await User.findById(socket.userId))?.level || 1
     });
   } catch (error) {
-    console.error('❌ 保存游戏结果失败:', error);
+    logger.error('保存游戏结果失败:', error);
   }
 }
 

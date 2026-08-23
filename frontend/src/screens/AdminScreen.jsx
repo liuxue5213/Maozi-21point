@@ -1,3 +1,4 @@
+import { toast } from "../utils/toast";
 import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, ScrollView, TextInput } from '../rnw';
 import useGameStore from '../store/gameStore';
@@ -33,7 +34,7 @@ const AdminScreen = ({ onBack }) => {
     try {
       await fetch(`/api/admin/users/${id}/${action}`, { method: 'PUT', headers: { Authorization: `Bearer ${token}` } });
       fetchUsers();
-    } catch (e) { window.alert('操作失败'); }
+    } catch (e) { toast.info('操作失败'); }
   };
 
   return (

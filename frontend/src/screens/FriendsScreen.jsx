@@ -1,3 +1,4 @@
+import { toast } from "../utils/toast";
 import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, ScrollView, TextInput } from '../rnw';
 import useGameStore from '../store/gameStore';
@@ -32,17 +33,17 @@ const FriendsScreen = ({ onBack }) => {
     try {
       const res = await fetch('/api/users/friends/add', { method: 'POST', headers: { 'Content-Type':'application/json', Authorization: `Bearer ${token}` }, body: JSON.stringify({ username: searchName.trim() }) });
       const data = await res.json();
-      window.alert(data.message || data.error || '已发送请求');
+      toast.info(data.message || data.error || '已发送请求');
       setSearchName('');
       fetchRequests();
-    } catch (e) { window.alert('添加失败'); }
+    } catch (e) { toast.info('添加失败'); }
   };
 
   const acceptFriend = async (id) => {
     try {
       await fetch('/api/users/friends/accept', { method: 'POST', headers: { 'Content-Type':'application/json', Authorization: `Bearer ${token}` }, body: JSON.stringify({ friendId: id }) });
       fetchFriends(); fetchRequests();
-    } catch (e) { window.alert('操作失败'); }
+    } catch (e) { toast.info('操作失败'); }
   };
 
   return (

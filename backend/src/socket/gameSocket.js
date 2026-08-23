@@ -7,6 +7,7 @@ const { GameState } = require('../game/GameEngine');
 const { User } = require('../models/User');
 const { initGameHandlers } = require('./handlers/gameHandlers');
 const { initSocialHandlers } = require('./handlers/socialHandlers');
+const logger = require('../utils/logger');
 
 // 共享状态
 const sharedState = {
@@ -32,13 +33,13 @@ function initSocket(io) {
 
   io.on('connection', async (socket) => {
     const userId = socket.userId;
-    console.log(`玩家连接: ${socket.id}, 用户ID: ${userId}`);
+    logger.info(`玩家连接: ${socket.id}, 用户ID: ${userId}`);
 
     // 加载用户信息
     try {
       const user = await User.findById(userId);
       if (!user) {
-        console.error('❌ 用户不存在:', userId);
+        logger.error('❌ 用户不存在:', userId);
         socket.disconnect();
         return;
       }
@@ -46,9 +47,9 @@ function initSocket(io) {
       socket.playerId = userId;
       socket.userChips = user.chips;
       sharedState.playerChipsMap.set(socket.id, user.chips);
-      console.log(`✅ 用户加载成功: ${user.username}, 筹码: ${user.chips}`);
+      logger.info(`✅ 用户加载成功: ${user.username}, 筹码: ${user.chips}`);
     } catch (error) {
-      console.error('❌ 加载用户失败:', error);
+      logger.error('❌ 加载用户失败:', error);
       socket.disconnect();
       return;
     }
@@ -68,11 +69,11 @@ function initSocket(io) {
 
     // 断开连接
     socket.on('disconnect', async () => {
-      console.log(`玩家断开: ${socket.id}`);
+      logger.info(`玩家断开: ${socket.id}`);
       // 保存筹码
       const chips = sharedState.playerChipsMap.get(socket.id);
       if (chips !== undefined) {
-        await User.setChips(userId, chips).catch(console.error);
+        await User.setChips(userId, chips).catch(logger.error);
       }
       // 清理状态
       const matchIndex = sharedState.matchQueue.findIndex(p => p.id === socket.id);

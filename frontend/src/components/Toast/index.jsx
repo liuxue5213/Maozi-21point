@@ -5,6 +5,7 @@
 
 import React, { useState, useEffect, useCallback, createContext, useContext } from 'react';
 import { View, Text, StyleSheet } from '../../rnw';
+import { setToastHandler } from '../../utils/toast';
 
 // Toast Context
 const ToastContext = createContext({ showToast: () => {} });
@@ -19,6 +20,11 @@ export const ToastProvider = ({ children }) => {
     setToast({ message, type });
     setTimeout(() => setToast(null), duration);
   }, []);
+
+  // 注册全局toast处理器
+  useEffect(() => {
+    setToastHandler(showToast);
+  }, [showToast]);
 
   return (
     <ToastContext.Provider value={{ showToast }}>
