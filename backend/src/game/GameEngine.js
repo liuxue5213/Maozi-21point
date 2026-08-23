@@ -212,13 +212,48 @@ class GameEngine {
   nextTurn() {
     const activePlayers = [...this.players.values()].filter(p => p.cards.length > 0);
     const currentIndex = activePlayers.findIndex(p => p.id === this.currentTurn);
-    
+
     if (currentIndex < activePlayers.length - 1) {
       this.currentTurn = activePlayers[currentIndex + 1].id;
+
+      // 如果下一个玩家是AI，自动执行AI操作
+      const nextPlayer = activePlayers[currentIndex + 1];
+      if (nextPlayer.id.startsWith('ai_')) {
+        this.executeAITurn(nextPlayer);
+      }
     } else {
       // 所有玩家结束，庄家回合
       this.dealerPlay();
     }
+  }
+
+  // 执行AI回合操作
+  executeAITurn(aiPlayer) {
+    // 延迟执行，模拟思考时间
+    setTimeout(() => {
+      const dealerVisibleCard = this.dealer.cards[0];
+      const canDouble = aiPlayer.cards.length === 2 && aiPlayer.chips >= aiPlayer.bet;
+
+      // 导入AI决策
+      const { AIPlayer } = require('./AIPlayer');
+      const ai = new AIPlayer('medium');
+      const decision = ai.decide(aiPlayer.cards, dealerVisibleCard, canDouble);
+
+      // 执行AI决策
+      switch (decision) {
+        case 'hit':
+          this.hit(aiPlayer.id);
+          break;
+        case 'stand':
+          this.stand(aiPlayer.id);
+          break;
+        case 'double':
+          this.doubleDown(aiPlayer.id);
+          break;
+        default:
+          this.stand(aiPlayer.id);
+      }
+    }, 1000); // 1秒思考时间
   }
 
   // 庄家回合
