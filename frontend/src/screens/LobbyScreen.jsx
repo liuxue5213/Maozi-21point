@@ -118,46 +118,42 @@ const LobbyScreen = () => {
           </View>
         </View>
 
-        {/* 快捷导航 */}
-        <View style={styles.quickNav}>
-          <TouchableOpacity style={styles.quickNavBtn} onPress={() => setScreen('checkin')}>
-            <Text style={styles.quickNavIcon}>📅</Text>
-            <Text style={styles.quickNavText}>签到</Text>
+        {/* 快捷导航 - 单行 */}
+        <View style={styles.quickNavRow}>
+          <TouchableOpacity style={styles.quickNavBtnSmall} onPress={() => setScreen('checkin')}>
+            <Text style={styles.quickNavIconSmall}>📅</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.quickNavBtn} onPress={() => setScreen('leaderboard')}>
-            <Text style={styles.quickNavIcon}>🏆</Text>
-            <Text style={styles.quickNavText}>排行榜</Text>
+          <TouchableOpacity style={styles.quickNavBtnSmall} onPress={() => setScreen('leaderboard')}>
+            <Text style={styles.quickNavIconSmall}>🏆</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.quickNavBtn} onPress={() => setScreen('profile')}>
-            <Text style={styles.quickNavIcon}>👤</Text>
-            <Text style={styles.quickNavText}>个人中心</Text>
+          <TouchableOpacity style={styles.quickNavBtnSmall} onPress={() => setScreen('profile')}>
+            <Text style={styles.quickNavIconSmall}>👤</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.quickNavBtn} onPress={() => setScreen('friends')}>
-            <Text style={styles.quickNavIcon}>👥</Text>
-            <Text style={styles.quickNavText}>好友</Text>
+          <TouchableOpacity style={styles.quickNavBtnSmall} onPress={() => setScreen('friends')}>
+            <Text style={styles.quickNavIconSmall}>👥</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.quickNavBtnSmall} onPress={() => setScreen('chat')}>
+            <Text style={styles.quickNavIconSmall}>💬</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.quickNavBtnSmall} onPress={() => setScreen('shop')}>
+            <Text style={styles.quickNavIconSmall}>🛒</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.quickNavBtnSmall} onPress={() => setScreen('tournament')}>
+            <Text style={styles.quickNavIconSmall}>🎯</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.quickNavBtnSmall} onPress={() => setScreen('admin')}>
+            <Text style={styles.quickNavIconSmall}>🔧</Text>
           </TouchableOpacity>
         </View>
-
-        <View style={styles.quickNav}>
-          <TouchableOpacity style={styles.quickNavBtn} onPress={() => setScreen('chat')}>
-            <Text style={styles.quickNavIcon}>💬</Text>
-            <Text style={styles.quickNavText}>聊天</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.quickNavBtn} onPress={() => setScreen('shop')}>
-            <Text style={styles.quickNavIcon}>🛒</Text>
-            <Text style={styles.quickNavText}>商店</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.quickNavBtn} onPress={() => setScreen('tournament')}>
-            <Text style={styles.quickNavIcon}>🎯</Text>
-            <Text style={styles.quickNavText}>比赛</Text>
-          </TouchableOpacity>
-          {isAdmin && (
-            <TouchableOpacity style={styles.quickNavBtn} onPress={() => setScreen('admin')}>
-              <Text style={styles.quickNavIcon}>🔧</Text>
-              <Text style={styles.quickNavText}>管理</Text>
-            </TouchableOpacity>
-          )}
-          {!isAdmin && <View style={styles.quickNavBtn} />}
+        <View style={styles.quickNavLabels}>
+          <Text style={styles.quickNavLabel}>签到</Text>
+          <Text style={styles.quickNavLabel}>排行</Text>
+          <Text style={styles.quickNavLabel}>个人</Text>
+          <Text style={styles.quickNavLabel}>好友</Text>
+          <Text style={styles.quickNavLabel}>聊天</Text>
+          <Text style={styles.quickNavLabel}>商店</Text>
+          <Text style={styles.quickNavLabel}>比赛</Text>
+          <Text style={styles.quickNavLabel}>管理</Text>
         </View>
       </ScrollView>
     </View>
@@ -354,6 +350,35 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#8a8580',
     lineHeight: 1.8,
+  },
+  quickNavRow: {
+    flexDirection: 'row',
+    gap: 6,
+    marginTop: 16,
+  },
+  quickNavBtnSmall: {
+    flex: 1,
+    paddingVertical: 8,
+    backgroundColor: 'white',
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#ebe7e2',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  quickNavIconSmall: {
+    fontSize: 16,
+  },
+  quickNavLabels: {
+    flexDirection: 'row',
+    gap: 6,
+    marginTop: 4,
+  },
+  quickNavLabel: {
+    flex: 1,
+    fontSize: 9,
+    color: '#8a8580',
+    textAlign: 'center',
   },
   quickNav: {
     flexDirection: 'row',

@@ -19,6 +19,7 @@ const friendRoutes = require('./routes/friends');
 const achievementRoutes = require('./routes/achievements');
 const adminRoutes = require('./routes/admin');
 const shopRoutes = require('./routes/shop');
+const tournamentRoutes = require('./routes/tournament');
 
 // 初始化数据库
 require('./database/db');
@@ -60,6 +61,7 @@ app.use('/api/users/friends', friendRoutes);
 app.use('/api/users/achievements', achievementRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/shop', shopRoutes);
+app.use('/api/tournament', tournamentRoutes);
 
 // 静态文件服务（前端构建产物）
 app.use(express.static(path.join(__dirname, '../../frontend/dist')));
