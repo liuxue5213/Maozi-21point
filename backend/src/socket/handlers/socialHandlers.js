@@ -3,18 +3,33 @@
  * 聊天、好友对战、私人房间
  */
 
+const { dbAsync } = require('../../database/db');
+const logger = require('../../utils/logger');
+
 function initSocialHandlers(io) {
   const privateRooms = new Map();
 
   return (socket) => {
     // 聊天
-    socket.on('chat:message', (data) => {
-      io.emit('chat:message', {
+    socket.on('chat:message', async (data) => {
+      const msg = {
         userId: socket.userId,
         username: socket.playerName,
-        message: data.message,
+        message: String(data.message || '').slice(0, 200),
         timestamp: new Date().toISOString()
-      });
+      };
+
+      // 保存到数据库
+      try {
+        await dbAsync.run(
+          'INSERT INTO chat_messages (user_id, username, message) VALUES (?, ?, ?)',
+          [msg.userId, msg.username, msg.message]
+        );
+      } catch (error) {
+        logger.error('保存聊天失败:', error);
+      }
+
+      io.emit('chat:message', msg);
     });
 
     // 创建私人房间

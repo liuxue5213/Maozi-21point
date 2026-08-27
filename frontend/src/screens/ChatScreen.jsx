@@ -7,14 +7,31 @@ import { View, Text, TouchableOpacity, StyleSheet, ScrollView, TextInput } from 
 import useGameStore from '../store/gameStore';
 
 const ChatScreen = ({ onBack }) => {
-  const { user, socket, connected } = useGameStore();
+  const { user, socket, connected, token } = useGameStore();
   const [messages, setMessages] = useState([]);
   const [inputText, setInputText] = useState('');
   const scrollRef = useRef(null);
 
+  // 加载聊天历史
+  useEffect(() => {
+    const loadHistory = async () => {
+      try {
+        const res = await fetch('/api/users/chat/history?limit=50', {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        const data = await res.json();
+        if (res.ok && data.messages) {
+          setMessages(data.messages);
+          setTimeout(() => scrollRef.current?.scrollToEnd({ animated: true }), 200);
+        }
+      } catch (e) { console.error(e); }
+    };
+    loadHistory();
+  }, [token]);
+
   useEffect(() => {
     if (!socket) return;
-    
+
     const handleMessage = (data) => {
       setMessages((prev) => [...prev.slice(-99), data]);
       setTimeout(() => scrollRef.current?.scrollToEnd({ animated: true }), 100);

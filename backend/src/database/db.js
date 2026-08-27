@@ -110,6 +110,18 @@ function initializeTables() {
       )
     `);
 
+    // 聊天消息表
+    db.run(`
+      CREATE TABLE IF NOT EXISTS chat_messages (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id TEXT NOT NULL,
+        username TEXT NOT NULL,
+        message TEXT NOT NULL,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+    db.run('CREATE INDEX IF NOT EXISTS idx_chat_created ON chat_messages(created_at DESC)');
+
     // 管理员操作日志表
     db.run(`
       CREATE TABLE IF NOT EXISTS admin_logs (

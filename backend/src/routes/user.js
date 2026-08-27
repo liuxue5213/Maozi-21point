@@ -95,6 +95,28 @@ router.get('/online', async (req, res) => {
   }
 });
 
+// 获取聊天历史
+router.get('/chat/history', authMiddleware, async (req, res) => {
+  try {
+    const limit = Math.min(parseInt(req.query.limit) || 50, 100);
+    const messages = await dbAsync.all(
+      'SELECT user_id, username, message, created_at FROM chat_messages ORDER BY created_at DESC LIMIT ?',
+      [limit]
+    );
+    res.json({
+      messages: messages.reverse().map(m => ({
+        userId: m.user_id,
+        username: m.username,
+        message: m.message,
+        timestamp: m.created_at
+      }))
+    });
+  } catch (error) {
+    console.error('获取聊天历史错误:', error);
+    res.status(500).json({ error: '获取聊天历史失败' });
+  }
+});
+
 // 更新用户资料
 router.put('/profile', authMiddleware, async (req, res) => {
   try {
