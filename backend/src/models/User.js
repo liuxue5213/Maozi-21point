@@ -258,6 +258,24 @@ class User {
     }
   }
 
+  // 使用道具
+  static async useItem(userId, itemType) {
+    const items = await this.getUserItems(userId);
+    const count = items[itemType] || 0;
+
+    if (count <= 0) {
+      return { success: false, message: '道具数量不足' };
+    }
+
+    await this.updateUserItem(userId, itemType, -1);
+    return { success: true };
+  }
+
+  // 获取用户道具库存
+  static async getUserInventory(userId) {
+    return await this.getUserItems(userId);
+  }
+
   // 购买道具
   static async buyItem(userId, itemType, quantity = 1) {
     const item = ITEM_TYPES[itemType];

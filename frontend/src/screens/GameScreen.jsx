@@ -10,9 +10,45 @@ import BettingControls from '../components/BettingControls';
 import GameActions from '../components/GameActions';
 
 const GameScreen = () => {
-  const { gameState, playerId, gameMode, backToLobby, user, updateUserInfo } = useGameStore();
+  const { gameState, playerId, gameMode, backToLobby, user, updateUserInfo, socket, token } = useGameStore();
   const [score, setScore] = useState({ win: 0, lose: 0, draw: 0 });
   const [lastResult, setLastResult] = useState(null);
+  const [items, setItems] = useState({});
+  const [itemMessage, setItemMessage] = useState('');
+
+  // 道具定义
+  const ITEM_LIST = [
+    { type: 'hint', icon: '💡', name: '提示' },
+    { type: 'double', icon: '💰', name: '双倍' },
+    { type: 'insurance', icon: '🛡️', name: '保险' },
+    { type: 'lucky', icon: '🍀', name: '幸运' },
+  ];
+
+  // 获取道具库存
+  useEffect(() => {
+    if (!socket) return;
+    socket.emit('getItems');
+    const handler = (data) => setItems(data.items || {});
+    socket.on('playerItems', handler);
+    return () => socket.off('playerItems', handler);
+  }, [socket]);
+
+  // 监听道具使用结果
+  useEffect(() => {
+    if (!socket) return;
+    const handler = (data) => {
+      setItemMessage(data.message || '');
+      setTimeout(() => setItemMessage(''), 3000);
+      if (data.success) socket.emit('getItems');
+    };
+    socket.on('itemResult', handler);
+    return () => socket.off('itemResult', handler);
+  }, [socket]);
+
+  const handleUseItem = (itemType) => {
+    if (!socket || (items[itemType] || 0) <= 0) return;
+    socket.emit('useItem', { itemType });
+  };
 
   // 计算手牌点数
   const calcHand = (cards) => {
@@ -164,6 +200,34 @@ const GameScreen = () => {
           {me?.totalBet > 0 && <Text style={styles.myBet}>下注: {me.totalBet}</Text>}
         </View>
       </ScrollView>
+
+      {/* 道具提示 */}
+      {itemMessage ? (
+        <View style={styles.itemMessageBar}>
+          <Text style={styles.itemMessageText}>{itemMessage}</Text>
+        </View>
+      ) : null}
+
+      {/* 道具栏 */}
+      {isPlaying && (
+        <View style={styles.itemBar}>
+          {ITEM_LIST.map(item => {
+            const count = items[item.type] || 0;
+            return (
+              <TouchableOpacity
+                key={item.type}
+                style={[styles.itemBtn, count <= 0 && styles.itemBtnDisabled]}
+                onPress={() => handleUseItem(item.type)}
+                disabled={count <= 0}
+              >
+                <Text style={styles.itemIcon}>{item.icon}</Text>
+                <Text style={styles.itemName}>{item.name}</Text>
+                <Text style={styles.itemCount}>x{count}</Text>
+              </TouchableOpacity>
+            );
+          })}
+        </View>
+      )}
 
       {/* 底部操作 */}
       <View style={styles.controls}>
@@ -343,6 +407,50 @@ const styles = StyleSheet.create({
   },
   controls: {
     flexShrink: 0,
+  },
+  itemBar: {
+    flexDirection: 'row',
+    gap: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    backgroundColor: 'white',
+    borderTopWidth: 1,
+    borderTopColor: '#e8e2d8',
+    flexShrink: 0,
+  },
+  itemBtn: {
+    flex: 1,
+    alignItems: 'center',
+    gap: 1,
+    paddingVertical: 6,
+    backgroundColor: '#f5f3f0',
+    borderRadius: 8,
+  },
+  itemBtnDisabled: {
+    opacity: 0.4,
+  },
+  itemIcon: {
+    fontSize: 14,
+  },
+  itemName: {
+    fontSize: 9,
+    color: '#7a7068',
+  },
+  itemCount: {
+    fontSize: 9,
+    color: '#c4945c',
+    fontWeight: '600',
+  },
+  itemMessageBar: {
+    backgroundColor: '#fff8e1',
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    alignItems: 'center',
+    flexShrink: 0,
+  },
+  itemMessageText: {
+    fontSize: 12,
+    color: '#8b6914',
   },
   fallbackControls: {
     padding: 20,

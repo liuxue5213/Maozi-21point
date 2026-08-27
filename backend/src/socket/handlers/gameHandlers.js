@@ -80,11 +80,18 @@ async function handlePvE(socket, io, data) {
   socket.emit('gameCreated', { gameId, mode: 'pve', aiDifficulty, aiName: ai.name });
   socket.emit('gameState', game.getState(socket.id));
 
-  // 包装AI操作后广播状态
+  // 包装AI操作后广播状态，并在AI继续回合时循环决策
   const originalExecuteAITurn = game.executeAITurn.bind(game);
   game.executeAITurn = (aiPlayer) => {
     originalExecuteAITurn(aiPlayer);
-    setTimeout(() => broadcastGameState(game, socketIO), 2200);
+    setTimeout(() => {
+      broadcastGameState(game, socketIO);
+      // AI要牌后仍未结束（还在AI回合），继续AI决策
+      const aiP = game.players.get(aiPlayer.id);
+      if (game.state === 'playing' && game.currentTurn === aiPlayer.id && aiP && !aiP.stood && !aiP.busted) {
+        game.executeAITurn(aiPlayer);
+      }
+    }, 2200);
   };
 }
 

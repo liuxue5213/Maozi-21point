@@ -363,6 +363,26 @@ class GameEngine {
     }
   }
 
+  // 获取提示（道具功能）
+  getHint(playerId) {
+    const player = this.players.get(playerId);
+    if (!player || player.cards.length === 0) return '暂无可用提示';
+
+    const playerScore = calculateHand(player.cards);
+    const dealerCard = this.dealer.cards[0];
+    const dealerValue = dealerCard ? dealerCard.value : 0;
+    const canDouble = player.cards.length === 2 && player.chips >= player.bet;
+
+    // 基础策略提示
+    if (playerScore >= 17) return '停牌（点数足够）';
+    if (playerScore <= 11) return canDouble ? '建议加倍' : '建议要牌';
+    if (playerScore >= 12 && playerScore <= 16) {
+      if (dealerValue >= 7) return '建议要牌（庄家明牌较大）';
+      return '建议停牌（庄家可能爆牌）';
+    }
+    return '建议停牌';
+  }
+
   // 获取游戏状态（发送给客户端）
   getState(playerId = null) {
     const players = [];

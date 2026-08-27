@@ -7,6 +7,7 @@ const { GameState } = require('../game/GameEngine');
 const { User } = require('../models/User');
 const { initGameHandlers } = require('./handlers/gameHandlers');
 const { initSocialHandlers } = require('./handlers/socialHandlers');
+const { initItemHandlers } = require('./handlers/itemHandlers');
 const logger = require('../utils/logger');
 
 // 共享状态
@@ -30,6 +31,8 @@ function broadcastGameState(game, io) {
 function initSocket(io) {
   // 初始化社交处理器
   const socialHandler = initSocialHandlers(io);
+  // 初始化道具处理器
+  const itemHandler = initItemHandlers(io, sharedState);
 
   io.on('connection', async (socket) => {
     const userId = socket.userId;
@@ -67,6 +70,9 @@ function initSocket(io) {
 
     // 初始化社交处理器
     socialHandler(socket);
+
+    // 初始化道具处理器
+    itemHandler(socket);
 
     // 断开连接
     socket.on('disconnect', async () => {
