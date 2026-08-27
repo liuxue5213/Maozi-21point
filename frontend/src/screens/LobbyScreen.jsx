@@ -76,6 +76,10 @@ const LobbyScreen = () => {
             <Text style={styles.topNavIcon}>📅</Text>
             <Text style={styles.topNavText}>签到</Text>
           </TouchableOpacity>
+          <TouchableOpacity style={styles.topNavBtn} onPress={() => setScreen('tasks')}>
+            <Text style={styles.topNavIcon}>🎯</Text>
+            <Text style={styles.topNavText}>任务</Text>
+          </TouchableOpacity>
           <TouchableOpacity style={styles.topNavBtn} onPress={() => setScreen('leaderboard')}>
             <Text style={styles.topNavIcon}>🏆</Text>
             <Text style={styles.topNavText}>排行</Text>

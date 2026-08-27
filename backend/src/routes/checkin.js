@@ -9,6 +9,101 @@ const { User } = require('../models/User');
 const { dbAsync } = require('../database/db');
 const { authMiddleware } = require('../middleware/auth');
 
+// 所有路由都需要认证
+router.use(authMiddleware);
+
+// ============ 每日任务 ============
+
+// 获取每日任务列表
+router.get('/tasks', async (req, res) => {
+  try {
+    const today = new Date().toISOString().split('T')[0];
+
+    // 确保任务定义存在
+    let taskDefs = await dbAsync.all('SELECT * FROM daily_tasks_def');
+    if (taskDefs.length === 0) {
+      const defaults = [
+        { id: 'play_game', name: '进行对局', type: 'play_game', target: 3, reward: 100 },
+        { id: 'win_game', name: '赢得对局', type: 'win_game', target: 2, reward: 200 },
+        { id: 'get_blackjack', name: '获得Blackjack', type: 'get_blackjack', target: 1, reward: 300 },
+        { id: 'checkin', name: '每日签到', type: 'checkin', target: 1, reward: 50 },
+      ];
+      for (const d of defaults) {
+        await dbAsync.run(
+          'INSERT OR IGNORE INTO daily_tasks_def (id, name, type, target, reward) VALUES (?, ?, ?, ?, ?)',
+          [d.id, d.name, d.type, d.target, d.reward]
+        );
+      }
+      taskDefs = await dbAsync.all('SELECT * FROM daily_tasks_def');
+    }
+
+    const userTasks = await dbAsync.all(
+      'SELECT * FROM daily_tasks WHERE user_id = ? AND task_date = ?',
+      [req.userId, today]
+    );
+
+    const icons = { play_game: '🎮', win_game: '🏆', get_blackjack: '🃏', checkin: '📅' };
+    const tasks = taskDefs.map(def => {
+      const ut = userTasks.find(t => t.task_id === def.id);
+      const progress = ut?.progress || 0;
+      return {
+        type: def.type,
+        name: def.name,
+        icon: icons[def.type] || '🎯',
+        target: def.target,
+        progress,
+        reward: def.reward,
+        completed: progress >= def.target,
+        claimed: Boolean(ut?.claimed)
+      };
+    });
+
+    res.json({ tasks, date: today });
+  } catch (error) {
+    console.error('获取每日任务错误:', error);
+    res.status(500).json({ error: '获取任务失败' });
+  }
+});
+
+// 领取任务奖励
+router.post('/tasks/claim', async (req, res) => {
+  try {
+    const { taskType } = req.body;
+    const today = new Date().toISOString().split('T')[0];
+
+    const def = await dbAsync.get('SELECT * FROM daily_tasks_def WHERE type = ?', [taskType]);
+    if (!def) return res.status(404).json({ error: '任务不存在' });
+
+    const userTask = await dbAsync.get(
+      'SELECT * FROM daily_tasks WHERE user_id = ? AND task_id = ? AND task_date = ?',
+      [req.userId, def.id, today]
+    );
+
+    const progress = userTask?.progress || 0;
+    if (progress < def.target) return res.status(400).json({ error: '任务还未完成' });
+    if (userTask?.claimed) return res.status(400).json({ error: '奖励已领取' });
+
+    await User.updateChips(req.userId, def.reward);
+    if (userTask) {
+      await dbAsync.run(
+        'UPDATE daily_tasks SET claimed = 1 WHERE user_id = ? AND task_id = ? AND task_date = ?',
+        [req.userId, def.id, today]
+      );
+    } else {
+      await dbAsync.run(
+        'INSERT INTO daily_tasks (user_id, task_id, task_date, progress, claimed) VALUES (?, ?, ?, ?, 1)',
+        [req.userId, def.id, today, progress]
+      );
+    }
+
+    const user = await User.findById(req.userId);
+    res.json({ message: `获得 ${def.reward} 筹码！`, reward: def.reward, chips: user.chips });
+  } catch (error) {
+    console.error('领取任务奖励错误:', error);
+    res.status(500).json({ error: '领取失败' });
+  }
+});
+
 // 签到表初始化SQL（首次使用时创建表）
 const CHECKIN_TABLE_SQL = `
   CREATE TABLE IF NOT EXISTS checkins (
@@ -29,7 +124,6 @@ async function ensureCheckinTable() {
 }
 
 // 所有路由都需要认证
-router.use(authMiddleware);
 
 // 每日签到领取奖励
 router.post('/', async (req, res) => {

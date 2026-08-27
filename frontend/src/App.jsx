@@ -18,6 +18,7 @@ import ChatScreen from './screens/ChatScreen';
 import ShopScreen from './screens/ShopScreen';
 import TournamentScreen from './screens/TournamentScreen';
 import MoreScreen from './screens/MoreScreen';
+import TasksScreen from './screens/TasksScreen';
 
 function App() {
   const { currentScreen, connect, disconnect, isAuthenticated, setScreen } = useGameStore();
@@ -59,6 +60,8 @@ function App() {
         return <TournamentScreen onBack={() => setScreen('lobby')} />;
       case 'more':
         return <MoreScreen onBack={() => setScreen('lobby')} />;
+      case 'tasks':
+        return <TasksScreen onBack={() => setScreen('lobby')} />;
       default:
         return <LobbyScreen />;
     }
