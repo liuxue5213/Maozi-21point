@@ -340,13 +340,14 @@ class User {
   // 更新每日任务进度
   static async updateDailyTaskProgress(userId, taskType, increment = 1) {
     const today = new Date().toISOString().split('T')[0];
+    await this.initDailyTasks(userId, today);
 
     await dbAsync.run(
       `UPDATE daily_tasks 
        SET progress = progress + ?,
-           completed = CASE WHEN progress + >= (SELECT target FROM daily_tasks_def WHERE type = ?) THEN 1 ELSE completed END
+           completed = CASE WHEN progress + ? >= (SELECT target FROM daily_tasks_def WHERE type = ? LIMIT 1) THEN 1 ELSE completed END
        WHERE user_id = ? AND task_date = ? AND task_id IN (SELECT id FROM daily_tasks_def WHERE type = ?)`,
-      [increment, taskType, userId, today, taskType]
+      [increment, increment, taskType, userId, today, taskType]
     );
   }
 

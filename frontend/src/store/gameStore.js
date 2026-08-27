@@ -168,6 +168,10 @@ const useGameStore = create((set, get) => ({
       set({ currentScreen: 'lobby', message: '' });
     });
 
+    socket.on('error', (data) => {
+      set({ error: data?.message || '操作失败' });
+    });
+
     socket.on('gameState', (state) => {
       set({ gameState: state });
     });

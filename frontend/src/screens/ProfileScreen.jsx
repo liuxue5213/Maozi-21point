@@ -35,7 +35,7 @@ const ProfileScreen = ({ onBack }) => {
 
   const fetchHistory = async () => {
     try {
-      const response = await fetch('/api/users/game-history?limit=10', {
+      const response = await fetch('/api/users/profile/history?limit=10', {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const data = await response.json();

@@ -46,6 +46,7 @@ function initSocket(io) {
       socket.playerName = user.username;
       socket.playerId = userId;
       socket.userChips = user.chips;
+      socket.join(userId);
       sharedState.playerChipsMap.set(socket.id, user.chips);
       logger.info(`✅ 用户加载成功: ${user.username}, 筹码: ${user.chips}`);
     } catch (error) {

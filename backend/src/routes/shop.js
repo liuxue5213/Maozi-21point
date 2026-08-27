@@ -22,6 +22,7 @@ router.get('/items', async (req, res) => {
     res.json({
       success: true,
       items: items.map(item => ({
+        id: item.type,
         type: item.type,
         name: item.name,
         icon: item.icon,
@@ -104,9 +105,12 @@ router.get('/inventory', authMiddleware, async (req, res) => {
     // 将道具信息补充完整
     const inventory = Object.entries(items).map(([type, count]) => ({
       type,
+      id: type,
+      itemId: type,
       name: ITEM_TYPES[type]?.name || type,
       icon: ITEM_TYPES[type]?.icon || '📦',
       count,
+      quantity: count,
       description: getItemDescription(type)
     }));
 

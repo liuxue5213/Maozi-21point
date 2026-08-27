@@ -7,7 +7,7 @@ import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from '../rnw';
 import useGameStore from '../store/gameStore';
 
 const ShopScreen = ({ onBack }) => {
-  const { token, user } = useGameStore();
+  const { token, user, updateUserInfo } = useGameStore();
   const [activeTab, setActiveTab] = useState('items');
   const [shopItems, setShopItems] = useState([]);
   const [userItems, setUserItems] = useState([]);
@@ -74,6 +74,7 @@ const ShopScreen = ({ onBack }) => {
       });
       const data = await response.json();
       if (response.ok) {
+        if (data.data?.chips !== undefined) updateUserInfo({ chips: data.data.chips });
         await fetchUserItems();
         await fetchShopItems();
       } else {
@@ -94,8 +95,8 @@ const ShopScreen = ({ onBack }) => {
   };
 
   const getUserItemCount = (itemId) => {
-    const owned = userItems.find((i) => i.itemId === itemId || i.id === itemId);
-    return owned ? owned.quantity : 0;
+    const owned = userItems.find((i) => i.itemId === itemId || i.id === itemId || i.type === itemId);
+    return owned ? (owned.quantity ?? owned.count ?? 0) : 0;
   };
 
   return (
@@ -148,7 +149,7 @@ const ShopScreen = ({ onBack }) => {
                     <Text style={styles.ownedDesc}>{item.description}</Text>
                   </View>
                   <View style={styles.ownedCount}>
-                    <Text style={styles.ownedCountText}>x{item.quantity}</Text>
+                    <Text style={styles.ownedCountText}>x{item.quantity ?? item.count ?? 0}</Text>
                   </View>
                 </View>
               ))}
@@ -172,11 +173,11 @@ const ShopScreen = ({ onBack }) => {
           ) : (
             <View style={styles.shopList}>
               {shopItems.map((item) => {
-                const ownedCount = getUserItemCount(item.id);
+                const ownedCount = getUserItemCount(item.id || item.type);
                 const canAfford = (user?.chips || 0) >= item.price;
 
                 return (
-                  <View key={item.id} style={styles.shopItem}>
+                  <View key={item.id || item.type} style={styles.shopItem}>
                     <View style={styles.itemIcon}>
                       <Text style={styles.itemIconText}>{getItemIcon(item)}</Text>
                     </View>
@@ -192,7 +193,7 @@ const ShopScreen = ({ onBack }) => {
                         styles.buyBtn,
                         (!canAfford || purchasing) && styles.buyBtnDisabled
                       ]}
-                      onPress={() => handlePurchase(item.id)}
+                      onPress={() => handlePurchase(item.id || item.type)}
                       disabled={!canAfford || purchasing}
                     >
                       <Text style={[

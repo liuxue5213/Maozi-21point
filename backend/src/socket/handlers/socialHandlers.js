@@ -33,7 +33,7 @@ function initSocialHandlers(io) {
       if (room.guestId) return socket.emit('error', { message: '房间已满' });
 
       room.guestId = socket.id;
-      socket.join(room.id);
+      socket.join(roomId);
       io.to(roomId).emit('privateRoomReady', { roomId });
     });
 

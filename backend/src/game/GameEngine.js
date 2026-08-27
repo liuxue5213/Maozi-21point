@@ -79,10 +79,10 @@ class GameEngine {
       stood: false,
       busted: false,
       blackjack: false,
-      blackjack: false,
       allIn: false,
       result: null,
       winAmount: 0,
+      roundStartingChips: chips,
       isAI: isAI, // 标记是否为AI玩家
     });
   }
@@ -93,11 +93,13 @@ class GameEngine {
 
   startRound() {
     this.round++;
+    this.startTime = Date.now();
     this.dealer = { cards: [], hidden: true };
     this.state = GameState.BETTING;
 
     // 重置玩家状态
     for (const [id, player] of this.players) {
+      player.roundStartingChips = player.chips;
       player.cards = [];
       player.bet = 0;
       player.totalBet = 0;
@@ -113,8 +115,11 @@ class GameEngine {
   placeBet(playerId, amount) {
     const player = this.players.get(playerId);
     if (!player || this.state !== GameState.BETTING) return false;
-    
-    amount = Math.min(amount, player.chips);
+
+    // Each player places one bet per round.  Socket payloads are untrusted.
+    if (player.totalBet > 0 || !Number.isSafeInteger(amount) || amount <= 0) return false;
+
+    amount = Math.min(amount, player.chips, this.maxBet);
     if (amount < this.minBet && amount !== player.chips) return false;
     
     player.chips -= amount;
@@ -145,13 +150,19 @@ class GameEngine {
     this.dealer.cards.push(this.deck.deal());
     this.dealer.cards.push(this.deck.deal());
 
-    // 设置第一个行动的玩家（人类玩家优先）
+    // Blackjack is settled automatically; those players do not receive a turn.
     const activePlayers = [...this.players.values()].filter(p => p.cards.length > 0);
-    if (activePlayers.length > 0) {
-      // 在PvE中确保人类玩家先行动
-      const humanPlayer = activePlayers.find(p => !p.isAI);
-      this.currentTurn = humanPlayer ? humanPlayer.id : activePlayers[0].id;
+    const playersNeedingTurn = activePlayers.filter(p => !p.blackjack);
+    if (playersNeedingTurn.length === 0) {
+      this.dealerPlay();
+      return true;
     }
+
+    // 在PvE中确保人类玩家先行动
+    const humanPlayer = playersNeedingTurn.find(p => !p.isAI);
+    const firstPlayer = humanPlayer || playersNeedingTurn[0];
+    this.currentTurn = firstPlayer.id;
+    if (firstPlayer.isAI) this.executeAITurn(firstPlayer);
 
     return true;
   }
@@ -216,14 +227,13 @@ class GameEngine {
 
   // 下一个玩家
   nextTurn() {
-    const activePlayers = [...this.players.values()].filter(p => p.cards.length > 0);
-    const currentIndex = activePlayers.findIndex(p => p.id === this.currentTurn);
+    const turnOrder = [...this.players.values()].filter(p => p.cards.length > 0);
+    const currentIndex = turnOrder.findIndex(p => p.id === this.currentTurn);
+    const nextPlayer = turnOrder.slice(currentIndex + 1)
+      .find(p => !p.stood && !p.busted && !p.blackjack);
 
-    if (currentIndex < activePlayers.length - 1) {
-      this.currentTurn = activePlayers[currentIndex + 1].id;
-
-      // 如果下一个玩家是AI，自动执行AI操作
-      const nextPlayer = activePlayers[currentIndex + 1];
+    if (nextPlayer) {
+      this.currentTurn = nextPlayer.id;
       if (nextPlayer.isAI || nextPlayer.id.startsWith('ai_')) {
         console.log('🤖 检测到AI玩家，执行自动操作:', nextPlayer.id);
         // 注意：这里需要传递广播回调，但这在GameEngine中不可用
@@ -287,7 +297,7 @@ class GameEngine {
     this.state = GameState.DEALER;
     this.dealer.hidden = false;
 
-    // 庄家软17点必须要牌
+    // 庄家停在所有 17 点（包括 soft 17）。
     while (calculateHand(this.dealer.cards) < 17) {
       this.dealer.cards.push(this.deck.deal());
     }
@@ -305,13 +315,14 @@ class GameEngine {
     const results = [];
 
     for (const [id, player] of this.players) {
-      if (player.result === 'lose') continue; // 已经爆牌
-
       const playerScore = calculateHand(player.cards);
       const playerBJ = player.blackjack;
-      const initialChips = player.chips;
+      const initialChips = player.roundStartingChips;
 
-      if (playerBJ && dealerBJ) {
+      if (player.busted) {
+        player.result = 'lose';
+        player.winAmount = 0;
+      } else if (playerBJ && dealerBJ) {
         player.result = 'push';
         player.chips += player.totalBet;
       } else if (playerBJ) {
