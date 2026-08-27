@@ -3,9 +3,10 @@
  */
 
 const express = require('express');
+const { v4: uuidv4 } = require('uuid');
 const router = express.Router();
 const { dbAsync } = require('../database/db');
-const { authMiddleware } = require('../middleware/auth');
+const { authMiddleware, adminMiddleware } = require('../middleware/auth');
 
 // 获取比赛列表
 router.get('/list', authMiddleware, async (req, res) => {
@@ -17,7 +18,7 @@ router.get('/list', authMiddleware, async (req, res) => {
        LEFT JOIN tournament_players tp ON tp.tournament_id = t.id
        WHERE t.status IN ('pending', 'active')
        GROUP BY t.id
-       ORDER BY t.start_time ASC
+       ORDER BY t.created_at DESC
        LIMIT 20`,
       [req.userId]
     );
@@ -25,12 +26,11 @@ router.get('/list', authMiddleware, async (req, res) => {
       tournaments: tournaments.map(t => ({
         id: t.id,
         name: t.name,
-        description: t.description,
         status: t.status,
         playerCount: t.player_count || 0,
         participants: t.player_count || 0,
-        maxPlayers: t.max_players || 32,
-        maxParticipants: t.max_players || 32,
+        maxPlayers: t.max_players || 8,
+        maxParticipants: t.max_players || 8,
         prizePool: t.prize_pool || 0,
         prize: t.prize_pool || 0,
         entryFee: t.entry_fee || 0,
@@ -42,6 +42,28 @@ router.get('/list', authMiddleware, async (req, res) => {
   } catch (error) {
     console.error('获取比赛列表错误:', error);
     res.json({ tournaments: [] });
+  }
+});
+
+// 创建比赛（管理员）
+router.post('/create', authMiddleware, adminMiddleware, async (req, res) => {
+  try {
+    const { name, maxPlayers, entryFee, prizePool } = req.body;
+    if (!name || name.trim().length === 0) {
+      return res.status(400).json({ error: '比赛名称不能为空' });
+    }
+
+    const id = uuidv4();
+    await dbAsync.run(
+      `INSERT INTO tournaments (id, name, creator_id, max_players, entry_fee, prize_pool, status)
+       VALUES (?, ?, ?, ?, ?, ?, 'pending')`,
+      [id, name.trim(), req.userId, maxPlayers || 8, entryFee || 0, prizePool || 0]
+    );
+
+    res.json({ message: '比赛创建成功', tournamentId: id });
+  } catch (error) {
+    console.error('创建比赛错误:', error);
+    res.status(500).json({ error: '创建失败，请稍后重试' });
   }
 });
 

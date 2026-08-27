@@ -15,3 +15,4 @@ export { FlatList } from 'react-native-web';
 export { Platform } from 'react-native-web';
 export { Dimensions } from 'react-native-web';
 export { SafeAreaView } from 'react-native-web';
+export { Modal } from 'react-native-web';
